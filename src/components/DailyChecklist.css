@@ -1,0 +1,439 @@
+.daily-checklist {
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Header */
+.daily-checklist-header {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-checklist-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--gradient-primary);
+}
+
+.daily-checklist-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.daily-checklist-date {
+  font-size: 1.125rem;
+  color: var(--gray-600);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.daily-checklist-reload-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius);
+  color: var(--gray-700);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.daily-checklist-reload-button:hover:not(:disabled) {
+  background: white;
+  border-color: var(--primary-500);
+  color: var(--primary-700);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.daily-checklist-reload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Summary */
+.daily-checklist-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.daily-checklist-summary-item {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 2px solid var(--gray-200);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-checklist-summary-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.daily-checklist-summary-item:nth-child(2) {
+  border-color: var(--success-200);
+  background: var(--success-50);
+}
+
+.daily-checklist-summary-item:nth-child(3) {
+  border-color: var(--error-200);
+  background: var(--error-50);
+}
+
+.daily-checklist-summary-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.daily-checklist-summary-value {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--gray-900);
+  line-height: 1;
+}
+
+.daily-checklist-summary-realizados .daily-checklist-summary-value {
+  color: var(--success-700);
+}
+
+.daily-checklist-summary-faltas .daily-checklist-summary-value {
+  color: var(--error-700);
+}
+
+/* Sections */
+.daily-checklist-section {
+  margin-bottom: 2.5rem;
+}
+
+.daily-checklist-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+/* Empty State */
+.daily-checklist-empty {
+  background: white;
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* List */
+.daily-checklist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.daily-checklist-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.daily-checklist-card:hover {
+  border-color: var(--primary-300);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(4px);
+}
+
+.daily-checklist-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.daily-checklist-client-name {
+  font-weight: 700;
+  color: var(--gray-900);
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.daily-checklist-service-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.daily-checklist-service-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.daily-checklist-service-type-salao {
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border: 1px solid var(--primary-200);
+}
+
+.daily-checklist-service-type-indicacao {
+  background: var(--info-100);
+  color: var(--info-700);
+  border: 1px solid var(--info-200);
+}
+
+.daily-checklist-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary-700);
+  margin-top: 0.5rem;
+}
+
+/* Actions */
+.daily-checklist-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.daily-checklist-success-button,
+.daily-checklist-danger-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.daily-checklist-success-button {
+  background: var(--gradient-success);
+  color: white;
+}
+
+.daily-checklist-success-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.daily-checklist-danger-button {
+  background: var(--error-50);
+  color: var(--error-700);
+  border: 2px solid var(--error-200);
+}
+
+.daily-checklist-danger-button:hover {
+  background: var(--error-100);
+  border-color: var(--error-300);
+  transform: translateY(-2px);
+}
+
+/* Completed List */
+.daily-checklist-completed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.daily-checklist-completed-card {
+  background: var(--success-50);
+  border: 1px solid var(--success-200);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--success-800);
+  font-weight: 500;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Totals */
+.daily-checklist-totals {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  margin: 2.5rem 0;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--gray-200);
+}
+
+.daily-checklist-total-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.daily-checklist-total-item:last-child {
+  border-bottom: none;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  border-top: 2px solid var(--gray-300);
+}
+
+.daily-checklist-total-final {
+  background: var(--primary-50);
+  margin: -2rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  border-top: 2px solid var(--primary-200);
+}
+
+.daily-checklist-total-label {
+  font-size: 1.125rem;
+  color: var(--gray-700);
+}
+
+.daily-checklist-total-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.daily-checklist-total-falta {
+  color: var(--error-700);
+}
+
+.daily-checklist-total-final .daily-checklist-total-value {
+  color: var(--primary-700);
+}
+
+/* Finalize Button */
+.daily-checklist-finalize-button {
+  width: 100%;
+  padding: 1.25rem 2rem;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-xl);
+}
+
+.daily-checklist-finalize-button:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.daily-checklist-finalize-button:active {
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .daily-checklist-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .daily-checklist-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .daily-checklist-actions {
+    width: 100%;
+  }
+  
+  .daily-checklist-success-button,
+  .daily-checklist-danger-button {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .daily-checklist-total-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-checklist-header {
+    padding: 1.5rem;
+  }
+  
+  .daily-checklist-title {
+    font-size: 1.5rem;
+  }
+  
+  .daily-checklist-value {
+    font-size: 1.25rem;
+  }
+  
+  .daily-checklist-service-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

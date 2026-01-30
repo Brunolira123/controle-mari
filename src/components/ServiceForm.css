@@ -1,0 +1,527 @@
+.service-form-page {
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Success Overlay */
+.service-form-success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.service-form-success-message {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 3rem;
+  text-align: center;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--gray-200);
+  animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.service-form-success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+.service-form-success-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--success-700);
+  background: linear-gradient(135deg, var(--success-500), var(--success-700));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Form Container */
+.service-form-container {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 2rem;
+}
+
+.form-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--gray-100);
+}
+
+.form-date-display {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--primary-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--primary-200);
+}
+
+.date-icon {
+  font-size: 1.25rem;
+}
+
+.date-text {
+  font-weight: 600;
+  color: var(--primary-700);
+}
+
+.form-instructions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.instruction-icon {
+  color: var(--warning-500);
+}
+
+/* Form */
+.service-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.service-form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.service-form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.service-form-label-icon {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Inputs */
+.service-form-input,
+.service-form-select,
+.service-form-textarea {
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+  background: white;
+  width: 100%;
+}
+
+.service-form-input:focus,
+.service-form-select:focus,
+.service-form-textarea:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.service-form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+.service-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.date-preview {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  padding: 0.5rem 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+}
+
+/* Tipo Container */
+.service-form-tipo-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.service-form-tipo-button {
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background: white;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-form-tipo-button:hover {
+  border-color: var(--gray-400);
+  transform: translateY(-2px);
+}
+
+.service-form-tipo-button-active-salao {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.service-form-tipo-button-active-indicacao {
+  border-color: var(--info-500);
+  background: var(--info-50);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.service-form-tipo-icon {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-form-tipo-button-active-salao .service-form-tipo-icon {
+  background: var(--primary-100);
+  color: var(--primary-600);
+}
+
+.service-form-tipo-button-active-indicacao .service-form-tipo-icon {
+  background: var(--info-100);
+  color: var(--info-600);
+}
+
+.service-form-tipo-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-form-tipo-title {
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+  font-size: 1.125rem;
+}
+
+.service-form-tipo-value {
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.service-form-tipo-button-active-salao .service-form-tipo-value {
+  color: var(--primary-700);
+}
+
+.service-form-tipo-button-active-indicacao .service-form-tipo-value {
+  color: var(--info-700);
+}
+
+.service-form-selected-dot {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.service-form-tipo-button-active-salao .service-form-selected-dot {
+  background: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.service-form-tipo-button-active-indicacao .service-form-selected-dot {
+  background: var(--info-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.diferenca-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--success-50);
+  border: 1px solid var(--success-200);
+  border-radius: var(--radius);
+  color: var(--success-700);
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.diferenca-icon {
+  font-size: 1.25rem;
+}
+
+/* Valor Container */
+.service-form-valor-container {
+  background: linear-gradient(135deg, var(--success-50), var(--emerald-100));
+  border: 2px solid var(--success-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-form-valor-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.service-form-valor-icon {
+  font-size: 2.5rem;
+  color: var(--success-600);
+}
+
+.service-form-valor-label {
+  font-weight: 700;
+  color: var(--gray-900);
+  font-size: 1.125rem;
+}
+
+.service-form-valor-subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.service-form-valor-principal {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--success-700);
+  line-height: 1;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--gray-100);
+}
+
+.service-form-submit-button {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 56px;
+}
+
+.service-form-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.service-form-submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.service-form-submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-spinner {
+  animation: spin 1s linear infinite;
+}
+
+.form-clear-button {
+  padding: 1rem 1.5rem;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.form-clear-button:hover {
+  background: var(--gray-200);
+  border-color: var(--gray-400);
+  transform: translateY(-1px);
+}
+
+/* Tips */
+.service-form-tips {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+}
+
+.tips-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.tip-card {
+  padding: 1.25rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.tip-card:hover {
+  background: white;
+  border-color: var(--primary-300);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.tip-icon {
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  background: var(--primary-100);
+  color: var(--primary-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tip-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tip-title {
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+}
+
+.tip-text {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .service-form-container {
+    padding: 1.5rem;
+  }
+  
+  .form-header-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .service-form-tipo-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .service-form-valor-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-form-valor-principal {
+    font-size: 2.5rem;
+  }
+  
+  .tip-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .tip-icon {
+    margin-bottom: 0.5rem;
+  }
+}
