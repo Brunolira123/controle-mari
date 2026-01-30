@@ -80,13 +80,6 @@ function App() {
         onNavigate={setCurrentView}
         user={user}
       />
-
-      {/* Modo mock badge (apenas no dashboard) */}
-      {user && currentView === 'dashboard' && (
-        <div className="mock-badge">
-          🧪 Offline
-        </div>
-      )}
     </div>
   )
 }

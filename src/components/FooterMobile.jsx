@@ -148,18 +148,7 @@ function FooterMobile({ currentView, onNavigate, user }) {
         </button>
       </div>
 
-      {/* Badge de Status (Flutuante) */}
-      <div className="mobile-status-badge">
-        <div className="status-indicator"></div>
-        <span>Online</span>
-        <span className="status-time">
-          {new Date().toLocaleTimeString('pt-BR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          })}
-        </span>
-      </div>
-    </div>
+         </div>
   );
 }
 
