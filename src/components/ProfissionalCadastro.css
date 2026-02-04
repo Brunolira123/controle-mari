@@ -1,0 +1,112 @@
+/* src/components/ProfissionalCadastro.css */
+.profissional-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profissional-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profissional-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.profissional-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.profissional-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.checkbox-field {
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.profissional-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+}
+
+.checkbox-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.profissional-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.profissional-submit-button {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s;
+}
+
+.profissional-submit-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.profissional-submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.profissional-cancel-button {
+  flex: 1;
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profissional-cancel-button:hover {
+  background: #eaeaea;
+}
+
+.submit-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -45,7 +45,7 @@ function App() {
   const views = {
     login: <Login onLogin={handleLogin} />,
     dashboard: user ? <Dashboard onNavigate={setCurrentView} user={user} /> : null,
-    agendar: user ? <ServiceForm onSuccess={() => setCurrentView('dashboard')} /> : null,
+    agendar: user ? <ServiceForm onSuccess={() => setCurrentView('dashboard')} user={user} /> : null,
     fechar: user ? <DailyChecklist onBack={() => setCurrentView('dashboard')} /> : null,
     quinzenal: user ? <QuinzenalReportMobile onBack={() => setCurrentView('dashboard')} /> : null, // Nova versão
   }
