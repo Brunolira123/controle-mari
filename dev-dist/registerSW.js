@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/controle-mari/dev-sw.js?dev-sw', { scope: '/controle-mari/', type: 'classic' })
