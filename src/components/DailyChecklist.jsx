@@ -201,19 +201,21 @@ export function DailyChecklist() {
     loadServices()
   }, [monthFilter])
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Sem data'
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    } catch (e) {
-      return dateString
-    }
+ const formatDate = (dateString) => {
+  if (!dateString) return 'Sem data'
+  try {
+    // Divide a string e cria data LOCAL (sem timezone issues)
+    const [year, month, day] = dateString.split('-').map(Number)
+    const date = new Date(year, month - 1, day) // Mês é 0-based no JS
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  } catch (e) {
+    return dateString
   }
+}
 
   const formatCurrency = (value) => {
     return parseFloat(value || 0).toLocaleString('pt-BR', {

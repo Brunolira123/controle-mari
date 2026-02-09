@@ -1,3 +1,4 @@
+// src/components/QuinzenalReportMobile.jsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
 import './QuinzenalReportMobile.css'
@@ -11,7 +12,7 @@ export function QuinzenalReportMobile() {
   const [expandedDay, setExpandedDay] = useState(null)
   const [viewMode, setViewMode] = useState('cards') // 'cards' ou 'text'
 
-  const anos = [2023, 2024, 2025, 2026]
+  const anos = [2023, 2024, 2025, 2026, 2027]
   const meses = [
     {id: 1, nome: 'Jan'},
     {id: 2, nome: 'Fev'},
@@ -27,21 +28,65 @@ export function QuinzenalReportMobile() {
     {id: 12, nome: 'Dez'}
   ]
 
+  // FUNÇÃO CORRIGIDA para obter data atual corretamente
   function getCurrentPeriod() {
     const hoje = new Date()
     const dia = hoje.getDate()
     return dia <= 15 ? 1 : 2
   }
 
+  // FUNÇÃO AUXILIAR CORRIGIDA para formatar datas
+  const formatarDataSegura = (dataString, opcoes = {}) => {
+    if (!dataString) return 'Sem data'
+    
+    try {
+      // Divide a string ISO "YYYY-MM-DD"
+      const [ano, mes, dia] = dataString.split('-').map(Number)
+      
+      // Validação
+      if (isNaN(ano) || isNaN(mes) || isNaN(dia)) {
+        return dataString
+      }
+      
+      // Cria data LOCAL (evita timezone bugs)
+      const data = new Date(ano, mes - 1, dia)
+      
+      // Opções padrão para exibição
+      const opcoesPadrao = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        ...opcoes
+      }
+      
+      return data.toLocaleDateString('pt-BR', opcoesPadrao)
+    } catch (error) {
+      console.error('Erro ao formatar data:', error)
+      return dataString
+    }
+  }
+
+  // Função para datas curtas (dia/mês)
+  const formatarDataCurta = (dataString) => {
+    if (!dataString) return ''
+    
+    try {
+      const [ano, mes, dia] = dataString.split('-').map(Number)
+      return `${dia.toString().padStart(2, '0')}/${mes.toString().padStart(2, '0')}`
+    } catch (error) {
+      return dataString
+    }
+  }
+
+  // FUNÇÃO CORRIGIDA para datas do período
   function getPeriodDates(period, year, month) {
     const mesStr = month.toString().padStart(2, '0')
-    const anoStr = year.toString().slice(2)
     
     if (period === 1) {
       return {
         inicio: `${year}-${mesStr}-01`,
         fim: `${year}-${mesStr}-15`,
-        label: `01/${mesStr}/${anoStr} a 15/${mesStr}/${anoStr}`,
+        label: `01/${mesStr}/${year} a 15/${mesStr}/${year}`,
         labelShort: `1ª Quinzena`
       }
     } else {
@@ -49,12 +94,13 @@ export function QuinzenalReportMobile() {
       return {
         inicio: `${year}-${mesStr}-16`,
         fim: `${year}-${mesStr}-${ultimoDia.toString().padStart(2, '0')}`,
-        label: `16/${mesStr}/${anoStr} a ${ultimoDia}/${mesStr}/${anoStr}`,
+        label: `16/${mesStr}/${year} a ${ultimoDia}/${mesStr}/${year}`,
         labelShort: `2ª Quinzena`
       }
     }
   }
 
+  // Carregar dados do relatório
   async function carregarRelatorio() {
     setLoading(true)
     const { inicio, fim } = getPeriodDates(periodo, ano, mes)
@@ -85,6 +131,7 @@ export function QuinzenalReportMobile() {
     }
   }
 
+  // Agrupar dados por dia
   function agruparPorDia(dados) {
     const agrupado = dados.reduce((acc, item) => {
       const data = item.data
@@ -101,16 +148,23 @@ export function QuinzenalReportMobile() {
     }, {})
 
     const arrayAgrupado = Object.values(agrupado)
-      .sort((a, b) => new Date(a.data) - new Date(b.data))
+      .sort((a, b) => {
+        const dataA = a.data.split('-').map(Number)
+        const dataB = b.data.split('-').map(Number)
+        return new Date(dataA[0], dataA[1] - 1, dataA[2]) - 
+               new Date(dataB[0], dataB[1] - 1, dataB[2])
+      })
     
     setResumoDiario(arrayAgrupado)
     setExpandedDay(null) // Fecha qualquer dia expandido
   }
 
+  // Calcular total geral
   function calcularTotalGeral() {
     return resumoDiario.reduce((total, dia) => total + dia.totalDia, 0)
   }
 
+  // Formatar nome do serviço
   function formatarNomeServico(servicoNome, quantidade) {
     let nome = servicoNome.replace(/\(.*?\)/g, '').trim()
     
@@ -128,6 +182,7 @@ export function QuinzenalReportMobile() {
     return nome.trim()
   }
 
+  // Exportar como texto (CORRIGIDO)
   function exportarComoTexto() {
     const { label } = getPeriodDates(periodo, ano, mes)
     let texto = `Fechamento ${label}\n\n`
@@ -135,10 +190,8 @@ export function QuinzenalReportMobile() {
     let totalGeral = 0
     
     resumoDiario.forEach(dia => {
-      const dataFormatada = new Date(dia.data).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit'
-      })
+      // USANDO FUNÇÃO CORRIGIDA
+      const dataFormatada = formatarDataCurta(dia.data)
       
       texto += `${dataFormatada}\n`
       
@@ -186,6 +239,7 @@ export function QuinzenalReportMobile() {
     alert('Relatório exportado com sucesso!')
   }
 
+  // Copiar para clipboard (CORRIGIDO)
   function copiarParaClipboard() {
     const { label } = getPeriodDates(periodo, ano, mes)
     let texto = `Fechamento ${label}\n\n`
@@ -193,10 +247,8 @@ export function QuinzenalReportMobile() {
     let totalGeral = 0
     
     resumoDiario.forEach(dia => {
-      const dataFormatada = new Date(dia.data).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit'
-      })
+      // USANDO FUNÇÃO CORRIGIDA
+      const dataFormatada = formatarDataCurta(dia.data)
       
       texto += `${dataFormatada}\n`
       
@@ -235,6 +287,7 @@ export function QuinzenalReportMobile() {
     alert('Relatório copiado para a área de transferência!')
   }
 
+  // Efeito para carregar relatório quando filtros mudam
   useEffect(() => {
     carregarRelatorio()
   }, [periodo, ano, mes])
@@ -371,8 +424,9 @@ export function QuinzenalReportMobile() {
               onClick={() => setExpandedDay(expandedDay === index ? null : index)}
             >
               <div className="day-header">
+                {/* CORRIGIDO: Usando função segura */}
                 <div className="day-date">
-                  {new Date(dia.data).toLocaleDateString('pt-BR', {
+                  {formatarDataSegura(dia.data, {
                     weekday: 'short',
                     day: 'numeric',
                     month: 'short'
@@ -402,7 +456,7 @@ export function QuinzenalReportMobile() {
                         </div>
                       </div>
                       <div className="service-value">
-                        R$ {parseFloat(item.valor).toFixed(2)}
+                        R$ {parseFloat(item.valor || 0).toFixed(2)}
                       </div>
                     </div>
                   ))}
@@ -420,10 +474,8 @@ export function QuinzenalReportMobile() {
           
           <div className="text-content">
             {resumoDiario.map(dia => {
-              const dataFormatada = new Date(dia.data).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit'
-              })
+              // CORRIGIDO: Usando função segura
+              const dataFormatada = formatarDataCurta(dia.data)
               
               const servicosAgrupados = dia.itens.reduce((acc, item) => {
                 const servicoNome = formatarNomeServico(item.servicos.nome, 1)
