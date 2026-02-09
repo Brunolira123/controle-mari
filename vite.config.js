@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/controle-mari/',
+  // A base só deve ser aplicada em produção para GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/controle-mari/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -11,7 +12,7 @@ export default defineConfig({
       includeAssets: [
         'favicon.ico',
         'apple-touch-icon.png',
-        'apple-touch-icon-*.png', // Todos os ícones iOS
+        'apple-touch-icon-*.png', 
         'favicon-16x16.png',
         'favicon-32x32.png',
         'pwa-192x192.png',
@@ -24,8 +25,8 @@ export default defineConfig({
         theme_color: '#8b5cf6',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/controle-mari/',
-        start_url: '/controle-mari/',
+        scope: process.env.NODE_ENV === 'production' ? '/controle-mari/' : '/',
+        start_url: process.env.NODE_ENV === 'production' ? '/controle-mari/' : '/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -43,7 +44,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
-        navigateFallback: '/controle-mari/index.html',
+        navigateFallback: process.env.NODE_ENV === 'production' ? '/controle-mari/index.html' : '/index.html',
         skipWaiting: true,
         clientsClaim: true
       }

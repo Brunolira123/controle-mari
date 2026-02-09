@@ -8,9 +8,10 @@
     "dev": "vite",
     "start": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist",
+    "build:gh": "vite build --base=/controle-mari/",
+    "deploy": "npm run build:gh && gh-pages -d dist",
+    "lint": "eslint .",
     "generate-icons": "node scripts/generate-icons.cjs"
   },
   "dependencies": {

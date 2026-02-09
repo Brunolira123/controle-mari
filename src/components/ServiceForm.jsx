@@ -1,4 +1,4 @@
-// src/components/ServiceForm.jsx - VERSÃO COMPLETA E CORRIGIDA
+// src/components/ServiceForm.jsx - VERSÃO CORRIGIDA E MELHORADA
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
 import ClientSelector from './ClientSelector.jsx'
@@ -19,13 +19,22 @@ export function ServiceForm({ onSuccess, user }) {
   const [showServicoModal, setShowServicoModal] = useState(false)
   const [showProfissionalModal, setShowProfissionalModal] = useState(false)
   
+  // CORREÇÃO DA DATA: Função para obter data atual correta
+  const getTodayDate = () => {
+    const now = new Date()
+    // Ajusta para o fuso horário de Brasília (UTC-3)
+    const offset = -3 * 60 // UTC-3 em minutos
+    const localTime = new Date(now.getTime() + offset * 60000)
+    return localTime.toISOString().split('T')[0]
+  }
+
   // Formulário principal
   const [form, setForm] = useState({
     cliente_id: '',
     servico_id: '',
     profissional_id: '',
     tipo: 'salao',
-    data: new Date().toISOString().split('T')[0],
+    data: getTodayDate(), // Usa função corrigida
     observacao: ''
   })
 
@@ -82,7 +91,6 @@ export function ServiceForm({ onSuccess, user }) {
         return
       }
       
-      console.log('Profissionais carregados:', profissionaisData)
       setProfissionais(profissionaisData || [])
       
       // Se não houver profissional selecionado e houver profissionais, seleciona o primeiro
@@ -131,10 +139,10 @@ export function ServiceForm({ onSuccess, user }) {
         setForm({ ...form, cliente_id: data[0].id })
         setNovoCliente({ nome: '', telefone: '' })
         setShowClienteModal(false)
-        alert('Cliente cadastrado com sucesso!')
+        alert('✅ Cliente cadastrado com sucesso!')
       }
     } catch (error) {
-      alert('Erro ao cadastrar cliente: ' + error.message)
+      alert('❌ Erro ao cadastrar cliente: ' + error.message)
       console.error('Erro detalhado:', error)
     }
   }
@@ -168,10 +176,10 @@ export function ServiceForm({ onSuccess, user }) {
         setForm({ ...form, servico_id: data[0].id })
         setNovoServico({ nome: '', comissao_salao: '', comissao_indicacao: '' })
         setShowServicoModal(false)
-        alert('Serviço cadastrado com sucesso!')
+        alert('✅ Serviço cadastrado com sucesso!')
       }
     } catch (error) {
-      alert('Erro ao cadastrar serviço: ' + error.message)
+      alert('❌ Erro ao cadastrar serviço: ' + error.message)
       console.error('Erro detalhado:', error)
     }
   }
@@ -185,13 +193,17 @@ export function ServiceForm({ onSuccess, user }) {
     e.preventDefault()
     
     if (!form.cliente_id || !form.servico_id || !form.profissional_id) {
-      alert('Preencha todos os campos obrigatórios!')
+      alert('⚠️ Preencha todos os campos obrigatórios!')
       return
     }
 
     setLoading(true)
     
     try {
+      // CORREÇÃO: Garante que a data será enviada corretamente
+      const dataFormatada = new Date(form.data)
+      const dataCorrigida = dataFormatada.toISOString().split('T')[0]
+      
       const { error } = await supabase
         .from('agendamentos')
         .insert({
@@ -199,7 +211,7 @@ export function ServiceForm({ onSuccess, user }) {
           servico_id: form.servico_id,
           profissional_id: form.profissional_id,
           tipo: form.tipo,
-          data: form.data,
+          data: dataCorrigida, // Usa data corrigida
           valor: valor,
           status: 'agendado',
           observacao: form.observacao.trim()
@@ -210,6 +222,7 @@ export function ServiceForm({ onSuccess, user }) {
       setShowSuccess(true)
       setTimeout(() => setShowSuccess(false), 2000)
       
+      // Limpa apenas alguns campos, mantendo data e profissional
       setForm({
         ...form,
         cliente_id: '',
@@ -222,27 +235,40 @@ export function ServiceForm({ onSuccess, user }) {
       }
       
     } catch (error) {
-      alert('Erro ao salvar: ' + error.message)
+      alert('❌ Erro ao salvar: ' + error.message)
       console.error('Erro detalhado:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const dataFormatada = new Date(form.data).toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-  })
+  // Função para formatar data corretamente
+  const formatarDataExibicao = (dateString) => {
+    try {
+      const data = new Date(dateString)
+      // Ajusta para o fuso horário local
+      const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000)
+      return dataAjustada.toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      })
+    } catch (e) {
+      return dateString
+    }
+  }
+
+  const dataFormatada = formatarDataExibicao(form.data)
 
   return (
     <div className="service-form-page">
       {/* ANIMAÇÃO DE SUCESSO */}
       {showSuccess && (
-        <div className="service-form-success-overlay">
-          <div className="service-form-success-message">
+        <div className="service-form-success-overlay animate-fade-in">
+          <div className="service-form-success-message animate-slide-down">
             <div className="service-form-success-icon">✨</div>
             <div className="service-form-success-text">Atendimento salvo com sucesso!</div>
+            <div className="service-form-success-subtext">📅 {dataFormatada}</div>
           </div>
         </div>
       )}
@@ -254,60 +280,11 @@ export function ServiceForm({ onSuccess, user }) {
         onSuccess={handleProfissionalCadastrado}
       />
 
-      {/* MODAL CADASTRO CLIENTE */}
-      <Modal 
-        isOpen={showClienteModal}
-        onClose={() => setShowClienteModal(false)}
-        title="Cadastrar Novo Cliente"
-      >
-        <div className="modal-form">
-          <div className="modal-field">
-            <label>Nome *</label>
-            <input
-              type="text"
-              value={novoCliente.nome}
-              onChange={e => setNovoCliente({...novoCliente, nome: e.target.value})}
-              placeholder="Nome completo"
-              className="modal-input"
-              required
-            />
-          </div>
-          
-          <div className="modal-field">
-            <label>Telefone</label>
-            <input
-              type="tel"
-              value={novoCliente.telefone}
-              onChange={e => setNovoCliente({...novoCliente, telefone: e.target.value})}
-              placeholder="(11) 99999-9999"
-              className="modal-input"
-            />
-          </div>
-          
-          <div className="modal-actions">
-            <button
-              onClick={cadastrarCliente}
-              className="modal-submit-button"
-            >
-              <span className="modal-submit-icon">✓</span>
-              Cadastrar Cliente
-            </button>
-            
-            <button
-              onClick={() => setShowClienteModal(false)}
-              className="modal-cancel-button"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </Modal>
-
       {/* MODAL CADASTRO SERVIÇO */}
       <Modal 
         isOpen={showServicoModal}
         onClose={() => setShowServicoModal(false)}
-        title="Cadastrar Novo Serviço"
+        title="💇 Cadastrar Novo Serviço"
       >
         <div className="modal-form">
           <div className="modal-field">
@@ -319,43 +296,55 @@ export function ServiceForm({ onSuccess, user }) {
               placeholder="Ex: Corte Masculino, Luzes, Progressiva"
               className="modal-input"
               required
+              autoFocus
             />
           </div>
           
-          <div className="modal-field">
-            <label>Comissão Salão (R$) *</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={novoServico.comissao_salao}
-              onChange={e => setNovoServico({...novoServico, comissao_salao: e.target.value})}
-              placeholder="0.00"
-              className="modal-input"
-              required
-            />
-          </div>
-          
-          <div className="modal-field">
-            <label>Comissão Indicação (R$) *</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={novoServico.comissao_indicacao}
-              onChange={e => setNovoServico({...novoServico, comissao_indicacao: e.target.value})}
-              placeholder="0.00"
-              className="modal-input"
-              required
-            />
+          <div className="modal-comissao-group">
+            <div className="modal-comissao-field">
+              <label>
+                <span className="comissao-icon">💈</span>
+                Comissão Salão (R$) *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={novoServico.comissao_salao}
+                onChange={e => setNovoServico({...novoServico, comissao_salao: e.target.value})}
+                placeholder="0.00"
+                className="modal-input comissao-input"
+                required
+              />
+            </div>
+            
+            <div className="modal-comissao-field">
+              <label>
+                <span className="comissao-icon">👥</span>
+                Comissão Indicação (R$) *
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={novoServico.comissao_indicacao}
+                onChange={e => setNovoServico({...novoServico, comissao_indicacao: e.target.value})}
+                placeholder="0.00"
+                className="modal-input comissao-input"
+                required
+              />
+            </div>
           </div>
           
           {novoServico.comissao_salao && novoServico.comissao_indicacao && (
-            <div className="comissao-diferenca">
-              <span className="diferenca-icon">📈</span>
-              <span className="diferenca-text">
+            <div className="comissao-diferenca-card">
+              <div className="comissao-diferenca-header">
+                <span className="diferenca-icon">📈</span>
+                <span className="diferenca-title">Diferença de Comissão</span>
+              </div>
+              <div className="comissao-diferenca-valor">
                 Indicação paga <strong>R$ {(parseFloat(novoServico.comissao_indicacao) - parseFloat(novoServico.comissao_salao)).toFixed(2)} a mais</strong>
-              </span>
+              </div>
             </div>
           )}
           
@@ -379,102 +368,89 @@ export function ServiceForm({ onSuccess, user }) {
       </Modal>
 
       {/* FORMULÁRIO PRINCIPAL */}
-      <div className="service-form-container animate-slide-up">
-        <div className="form-header-info">
-          <div className="form-date-display">
-            <span className="date-icon">📅</span>
-            <span className="date-text">{dataFormatada}</span>
+      <div className="service-form-container">
+        <div className="form-header-card">
+          <div className="form-header-content">
+            <h1 className="form-title">📋 Novo Atendimento</h1>
+            <div className="form-date-info">
+              <span className="date-icon">📅</span>
+              <span className="date-text">{dataFormatada}</span>
+            </div>
           </div>
-          <div className="form-instructions">
-            <span className="instruction-icon">💡</span>
-            <span>Preencha todos os campos obrigatórios (*)</span>
+          <div className="form-header-tip">
+            <span className="tip-icon">💡</span>
+            <span>Preencha todos os campos com *</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="service-form">
-          {/* DATA */}
-          <div className="service-form-field-group">
-            <label className="service-form-label">
-              <span className="service-form-label-icon">📅</span>
-              Data do Atendimento *
-            </label>
-            <input
-              type="date"
-              value={form.data}
-              onChange={e => setForm({...form, data: e.target.value})}
-              className="service-form-input"
-              required
-            />
-            <div className="date-preview">
-              {dataFormatada}
-            </div>
-          </div>
-
-          {/* PROFISSIONAL */}
-          <div className="service-form-field-group">
-            <div className="field-header-with-action">
-              <label className="service-form-label">
-                <span className="service-form-label-icon">👨‍💼</span>
-                Profissional *
+          {/* DATA E PROFISSIONAL EM LINHA */}
+          <div className="form-row">
+            <div className="form-field">
+              <label className="form-label">
+                <span className="form-label-icon">📅</span>
+                Data *
               </label>
-              <button
-                type="button"
-                onClick={() => setShowProfissionalModal(true)}
-                className="add-new-button"
-              >
-                <span className="add-icon">➕</span>
-                <span className="add-text">Novo Profissional</span>
-              </button>
+              <input
+                type="date"
+                value={form.data}
+                onChange={e => setForm({...form, data: e.target.value})}
+                className="form-input"
+                required
+                title="Data do agendamento"
+              />
+              <div className="date-hint">Selecionada: {dataFormatada}</div>
             </div>
-            
-            {loadingProfissionais ? (
-              <div className="loading-select">
-                <span className="loading-spinner-small">⏳</span>
-                Carregando profissionais...
+
+            <div className="form-field">
+              <div className="field-header">
+                <label className="form-label">
+                  <span className="form-label-icon">👨‍💼</span>
+                  Profissional *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowProfissionalModal(true)}
+                  className="add-new-small"
+                  title="Cadastrar novo profissional"
+                >
+                  +
+                </button>
               </div>
-            ) : (
-              <>
+              
+              {loadingProfissionais ? (
+                <div className="loading-state">
+                  <span className="loading-spinner">⏳</span>
+                  Carregando...
+                </div>
+              ) : (
                 <select
                   value={form.profissional_id}
                   onChange={e => setForm({...form, profissional_id: e.target.value})}
-                  className="service-form-select"
+                  className="form-select"
                   required
                 >
-                  <option value="">Selecione o profissional...</option>
+                  <option value="">Selecione...</option>
                   {profissionais.map(profissional => (
                     <option key={profissional.id} value={profissional.id}>
                       {profissional.nome}
                     </option>
                   ))}
                 </select>
-                
-                {profissionais.length === 0 && (
-                  <div className="empty-state">
-                    <span className="empty-icon">👨‍💼</span>
-                    <span className="empty-text">Nenhum profissional cadastrado</span>
-                    <span className="empty-hint">
-                      Clique em "Novo Profissional" para cadastrar
-                    </span>
-                  </div>
-                )}
-              </>
-            )}
+              )}
+            </div>
           </div>
 
           {/* CLIENTE */}
-          <div className="service-form-field-group">
+          <div className="form-field-group">
             <div className="field-header-with-action">
-              <label className="service-form-label">
-                <span className="service-form-label-icon">👤</span>
-                Cliente *
-              </label>
               <button
                 type="button"
                 onClick={() => setShowClienteModal(true)}
                 className="add-new-button"
               >
                 <span className="add-icon">➕</span>
-                <span className="add-text">Novo Cliente</span>
+                Novo Cliente
               </button>
             </div>
             
@@ -486,10 +462,10 @@ export function ServiceForm({ onSuccess, user }) {
           </div>
 
           {/* SERVIÇO */}
-          <div className="service-form-field-group">
+          <div className="form-field-group">
             <div className="field-header-with-action">
-              <label className="service-form-label">
-                <span className="service-form-label-icon">💇</span>
+              <label className="form-label">
+                <span className="form-label-icon">💇</span>
                 Serviço *
               </label>
               <button
@@ -498,63 +474,51 @@ export function ServiceForm({ onSuccess, user }) {
                 className="add-new-button"
               >
                 <span className="add-icon">➕</span>
-                <span className="add-text">Novo Serviço</span>
+                Novo Serviço
               </button>
             </div>
             
             {loadingServicos ? (
-              <div className="loading-select">
-                <span className="loading-spinner-small">⏳</span>
+              <div className="loading-state">
+                <span className="loading-spinner">⏳</span>
                 Carregando serviços...
               </div>
             ) : (
-              <>
-                <select
-                  value={form.servico_id}
-                  onChange={e => setForm({...form, servico_id: e.target.value})}
-                  className="service-form-select"
-                  required
-                >
-                  <option value="">Selecione um serviço...</option>
-                  {servicos.map(servico => (
-                    <option key={servico.id} value={servico.id}>
-                      {servico.nome} 
-                      {servico.comissao_salao && servico.comissao_indicacao && 
-                        ` (💈 R$${servico.comissao_salao} | 👥 R$${servico.comissao_indicacao})`
-                      }
-                    </option>
-                  ))}
-                </select>
-                
-                {servicos.length === 0 && (
-                  <div className="empty-state">
-                    <span className="empty-icon">💇</span>
-                    <span className="empty-text">Nenhum serviço cadastrado</span>
-                    <span className="empty-hint">
-                      Clique em "Novo Serviço" para cadastrar
-                    </span>
-                  </div>
-                )}
-              </>
+              <select
+                value={form.servico_id}
+                onChange={e => setForm({...form, servico_id: e.target.value})}
+                className="form-select"
+                required
+              >
+                <option value="">Selecione um serviço...</option>
+                {servicos.map(servico => (
+                  <option key={servico.id} value={servico.id}>
+                    {servico.nome} 
+                    {servico.comissao_salao && servico.comissao_indicacao && 
+                      ` | 💈 R$${servico.comissao_salao} | 👥 R$${servico.comissao_indicacao}`
+                    }
+                  </option>
+                ))}
+              </select>
             )}
           </div>
 
           {/* TIPO DE COMISSÃO */}
-          <div className="service-form-field-group">
-            <label className="service-form-label">
-              <span className="service-form-label-icon">💰</span>
+          <div className="form-field-group">
+            <label className="form-label">
+              <span className="form-label-icon">💰</span>
               Tipo de Comissão *
             </label>
-            <div className="service-form-tipo-container">
+            <div className="comissao-cards">
               <button
                 type="button"
                 onClick={() => setForm({...form, tipo: 'salao'})}
-                className={`service-form-tipo-button ${form.tipo === 'salao' ? 'service-form-tipo-button-active-salao' : ''}`}
+                className={`comissao-card ${form.tipo === 'salao' ? 'comissao-card-active' : ''} ${form.tipo === 'salao' ? 'comissao-card-salao' : ''}`}
               >
-                <div className="service-form-tipo-icon">💈</div>
-                <div className="service-form-tipo-content">
-                  <div className="service-form-tipo-title">Salão</div>
-                  <div className="service-form-tipo-value">
+                <div className="comissao-card-icon">💈</div>
+                <div className="comissao-card-content">
+                  <div className="comissao-card-title">Salão</div>
+                  <div className="comissao-card-value">
                     {servicoSelecionado 
                       ? `R$ ${servicoSelecionado.comissao_salao.toFixed(2)}`
                       : '--'
@@ -562,19 +526,19 @@ export function ServiceForm({ onSuccess, user }) {
                   </div>
                 </div>
                 {form.tipo === 'salao' && (
-                  <div className="service-form-selected-dot" />
+                  <div className="comissao-card-check">✓</div>
                 )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setForm({...form, tipo: 'indicacao'})}
-                className={`service-form-tipo-button ${form.tipo === 'indicacao' ? 'service-form-tipo-button-active-indicacao' : ''}`}
+                className={`comissao-card ${form.tipo === 'indicacao' ? 'comissao-card-active' : ''} ${form.tipo === 'indicacao' ? 'comissao-card-indicacao' : ''}`}
               >
-                <div className="service-form-tipo-icon">👥</div>
-                <div className="service-form-tipo-content">
-                  <div className="service-form-tipo-title">Indicação</div>
-                  <div className="service-form-tipo-value">
+                <div className="comissao-card-icon">👥</div>
+                <div className="comissao-card-content">
+                  <div className="comissao-card-title">Indicação</div>
+                  <div className="comissao-card-value">
                     {servicoSelecionado 
                       ? `R$ ${servicoSelecionado.comissao_indicacao.toFixed(2)}`
                       : '--'
@@ -582,13 +546,13 @@ export function ServiceForm({ onSuccess, user }) {
                   </div>
                 </div>
                 {form.tipo === 'indicacao' && (
-                  <div className="service-form-selected-dot" />
+                  <div className="comissao-card-check">✓</div>
                 )}
               </button>
             </div>
 
             {diferenca > 0 && (
-              <div className="diferenca-info">
+              <div className="comissao-diferenca-info">
                 <span className="diferenca-icon">📈</span>
                 <span className="diferenca-text">
                   Indicação paga <strong>R$ {diferenca.toFixed(2)} a mais</strong>
@@ -597,39 +561,53 @@ export function ServiceForm({ onSuccess, user }) {
             )}
           </div>
 
-          {/* VALOR CALCULADO */}
+          {/* RESUMO FINANCEIRO */}
           {servicoSelecionado && (
-            <div className="service-form-valor-container">
-              <div className="service-form-valor-header">
-                <div className="service-form-valor-icon">💵</div>
-                <div>
-                  <div className="service-form-valor-label">Valor a Receber</div>
-                  <div className="service-form-valor-subtitle">
-                    {form.tipo === 'salao' ? 'Comissão Salão' : 'Comissão por Indicação'}
-                  </div>
-                  {profissionalSelecionado && (
-                    <div className="profissional-info">
-                      <span className="profissional-icon">👨‍💼</span>
-                      <span>{profissionalSelecionado.nome}</span>
-                    </div>
-                  )}
+            <div className="resumo-financeiro-card">
+              <div className="resumo-header">
+                <div className="resumo-icon">💰</div>
+                <div className="resumo-title">Resumo do Atendimento</div>
+              </div>
+              
+              <div className="resumo-content">
+                <div className="resumo-item">
+                  <span className="resumo-label">Cliente:</span>
+                  <span className="resumo-value">{form.cliente_id ? 'Selecionado' : '--'}</span>
+                </div>
+                
+                <div className="resumo-item">
+                  <span className="resumo-label">Profissional:</span>
+                  <span className="resumo-value">
+                    {profissionalSelecionado ? profissionalSelecionado.nome : '--'}
+                  </span>
+                </div>
+                
+                <div className="resumo-item">
+                  <span className="resumo-label">Tipo:</span>
+                  <span className="resumo-value">
+                    {form.tipo === 'salao' ? '💈 Salão' : '👥 Indicação'}
+                  </span>
+                </div>
+                
+                <div className="resumo-valor-total">
+                  <span className="valor-total-label">Valor a Receber:</span>
+                  <span className="valor-total">R$ {valor.toFixed(2)}</span>
                 </div>
               </div>
-              <div className="service-form-valor-principal">R$ {valor.toFixed(2)}</div>
             </div>
           )}
 
           {/* OBSERVAÇÃO */}
-          <div className="service-form-field-group">
-            <label className="service-form-label">
-              <span className="service-form-label-icon">📝</span>
+          <div className="form-field-group">
+            <label className="form-label">
+              <span className="form-label-icon">📝</span>
               Observação (opcional)
             </label>
             <textarea
               value={form.observacao}
               onChange={e => setForm({...form, observacao: e.target.value})}
               placeholder="Ex: Cliente vai trazer o próprio produto, preferências, alergias, etc."
-              className="service-form-textarea"
+              className="form-textarea"
               rows="3"
             />
           </div>
@@ -639,80 +617,95 @@ export function ServiceForm({ onSuccess, user }) {
             <button
               type="submit"
               disabled={loading || !form.cliente_id || !form.servico_id || !form.profissional_id}
-              className="service-form-submit-button"
+              className="submit-button"
             >
               {loading ? (
                 <>
-                  <span className="submit-spinner">⏳</span>
-                  <span className="submit-text">Salvando...</span>
+                  <span className="button-spinner">⏳</span>
+                  <span className="button-text">Salvando...</span>
                 </>
               ) : (
                 <>
-                  <span className="submit-icon">💾</span>
-                  <span className="submit-text">Salvar Atendimento</span>
+                  <span className="button-icon">💾</span>
+                  <span className="button-text">Salvar Atendimento</span>
+                  <span className="button-hint">({dataFormatada})</span>
                 </>
               )}
             </button>
             
-            <button
-              type="button"
-              onClick={() => {
-                setForm({
-                  ...form,
-                  cliente_id: '',
-                  servico_id: '',
-                  observacao: ''
-                })
-              }}
-              className="form-clear-button"
-            >
-              <span className="clear-icon">🗑️</span>
-              <span className="clear-text">Limpar Campos</span>
-            </button>
+            <div className="secondary-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setForm({
+                    ...form,
+                    cliente_id: '',
+                    servico_id: '',
+                    observacao: ''
+                  })
+                }}
+                className="clear-button"
+              >
+                <span className="button-icon">🗑️</span>
+                Limpar
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setForm({...form, data: getTodayDate()})}
+                className="today-button"
+              >
+                <span className="button-icon">🔄</span>
+                Hoje
+              </button>
+            </div>
           </div>
         </form>
       </div>
 
       {/* DICAS RÁPIDAS */}
-      <div className="service-form-tips">
-        <h3 className="tips-title">💡 Dicas Rápidas</h3>
+      <div className="quick-tips-section">
+        <h3 className="tips-title">
+          <span className="tips-title-icon">💡</span>
+          Como funciona?
+        </h3>
         <div className="tips-grid">
           <div className="tip-card">
-            <div className="tip-icon">🚀</div>
-            <div className="tip-content">
-              <div className="tip-title">Cadastro rápido</div>
-              <div className="tip-text">
-                Cadastre profissionais, clientes e serviços na hora
-              </div>
-            </div>
-          </div>
-       
-          <div className="tip-card">
-            <div className="tip-icon">💰</div>
-            <div className="tip-content">
-              <div className="tip-title">Comissões</div>
-              <div className="tip-text">
-                Indicação sempre paga mais que salão
+            <div className="tip-card-icon">1️⃣</div>
+            <div className="tip-card-content">
+              <div className="tip-card-title">Escolha o Profissional</div>
+              <div className="tip-card-text">
+                Selecione quem vai atender
               </div>
             </div>
           </div>
           
           <div className="tip-card">
-            <div className="tip-icon">👨‍💼</div>
-            <div className="tip-content">
-              <div className="tip-title">Profissional</div>
-              <div className="tip-text">
-                Selecione quem realizará o atendimento
+            <div className="tip-card-icon">2️⃣</div>
+            <div className="tip-card-content">
+              <div className="tip-card-title">Cadastre se precisar</div>
+              <div className="tip-card-text">
+                Cliente, serviço ou profissional
               </div>
             </div>
           </div>
           
           <div className="tip-card">
-            <div className="tip-icon">📱</div>
-            <div className="tip-content">
-              <div className="tip-title">Prático</div>
-              <div className="tip-text">
-                Tudo feito direto pelo celular
+            <div className="tip-card-icon">3️⃣</div>
+            <div className="tip-card-content">
+              <div className="tip-card-title">Selecione o tipo</div>
+              <div className="tip-card-text">
+                💈 Salão ou 👥 Indicação
+              </div>
+            </div>
+          </div>
+          
+          <div className="tip-card">
+            <div className="tip-card-icon">4️⃣</div>
+            <div className="tip-card-content">
+              <div className="tip-card-title">Confira o valor</div>
+              <div className="tip-card-text">
+                Indicação sempre paga mais
               </div>
             </div>
           </div>

@@ -13,31 +13,28 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="App Mari">
   
-  <!-- Apple Touch Icons - TODOS OS TAMANHOS -->
-  <link rel="apple-touch-icon" href="/controle-mari/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="57x57" href="/controle-mari/apple-touch-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="/controle-mari/apple-touch-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="/controle-mari/apple-touch-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="/controle-mari/apple-touch-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/controle-mari/apple-touch-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/controle-mari/apple-touch-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/controle-mari/apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/controle-mari/apple-touch-icon-180x180.png">
-  
-  <!-- Splash Screens iOS (opcional mas ajuda) -->
-  <link rel="apple-touch-startup-image" href="/controle-mari/apple-touch-icon.png">
+  <!-- Apple Touch Icons - caminhos relativos -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
   
   <!-- Favicon geral -->
-  <link rel="icon" type="image/x-icon" href="/controle-mari/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/controle-mari/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/controle-mari/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   
   <!-- PWA Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/controle-mari/pwa-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/controle-mari/pwa-512x512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png">
   
-  <!-- Manifest com PATH ABSOLUTO -->
-  <link rel="manifest" href="/controle-mari/manifest.json">
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
   
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,6 +45,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="module" src="/controle-mari/src/main.jsx"></script>
+  <!-- O Vite vai injetar o caminho correto automaticamente -->
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
