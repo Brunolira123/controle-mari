@@ -6,19 +6,35 @@
   box-sizing: border-box;
 }
 
+/* BACKGROUND COM IMAGEM ÚNICA COBRINDO TODA A TELA */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
+  background-image: url('/image.png'); /* IMAGEM DA PASTA PUBLIC */
+  background-size: cover; /* COBRE TODA A TELA */
+  background-repeat: no-repeat; /* NÃO REPETE */
+  background-position: center center; /* CENTRALIZA */
+  background-attachment: fixed; /* FIXA AO ROLAR */
+  background-color: #f8fafc; /* COR DE FALBACK */
   color: var(--gray-800);
   line-height: 1.5;
+}
+
+/* Para garantir que a imagem carregue bem em todos os dispositivos */
+@media (max-width: 768px) {
+  body {
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--gray-50);
+  background: rgba(255, 255, 255, 0.85); /* FUNDO SEMI-TRANSPARENTE PARA LEGIBILIDADE */
 }
 
 /* Loading Screen */
@@ -28,7 +44,9 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: var(--gray-50);
+  background: rgba(255, 255, 255, 0.95); /* FUNDO BRANCO PARA LOADING */
+  text-align: center;
+  padding: 20px;
 }
 
 .loading-spinner {
@@ -51,7 +69,7 @@ body {
 }
 
 .loading-screen p {
-  color: var(--gray-600);
+  color: var(--gray-700);
   font-size: 1.125rem;
   font-weight: 500;
 }
@@ -63,6 +81,22 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
+  background: transparent; /* TRANSPARENTE PARA VER A IMAGEM */
+}
+
+/* Cards terão fundo branco para legibilidade */
+.card, .service-form-container, .daily-checklist {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-lg);
+  border-radius: 1rem;
+}
+
+/* Login container também com fundo branco */
+.login-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
 }
 
 /* Mock Badge */
@@ -70,7 +104,7 @@ body {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-  background: var(--gray-900);
+  background: rgba(31, 41, 55, 0.95);
   color: white;
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius-lg);
@@ -81,6 +115,7 @@ body {
   gap: 0.5rem;
   box-shadow: var(--shadow-xl);
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
   animation: slideInRight 0.5s ease-out;
 }

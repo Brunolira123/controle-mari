@@ -3,7 +3,7 @@ import Login from './components/Login.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import ServiceForm from './components/ServiceForm.jsx'
 import DailyChecklist from './components/DailyChecklist.jsx'
-import QuinzenalReportMobile from './components/QuinzenalReportMobile.jsx' // Nova versão
+import QuinzenalReportMobile from './components/QuinzenalReportMobile.jsx'
 import Header from './components/Header.jsx'
 import FooterMobile from './components/FooterMobile.jsx'
 import './App.css'
@@ -47,7 +47,7 @@ function App() {
     dashboard: user ? <Dashboard onNavigate={setCurrentView} user={user} /> : null,
     agendar: user ? <ServiceForm onSuccess={() => setCurrentView('dashboard')} user={user} /> : null,
     fechar: user ? <DailyChecklist onBack={() => setCurrentView('dashboard')} /> : null,
-    quinzenal: user ? <QuinzenalReportMobile onBack={() => setCurrentView('dashboard')} /> : null, // Nova versão
+    quinzenal: user ? <QuinzenalReportMobile onBack={() => setCurrentView('dashboard')} /> : null,
   }
 
   if (loading) {
@@ -74,7 +74,6 @@ function App() {
         {views[currentView] || views.login}
       </main>
 
-      {/* Footer Mobile otimizado para celular */}
       <FooterMobile 
         currentView={currentView}
         onNavigate={setCurrentView}
@@ -87,8 +86,8 @@ function App() {
 function getTitle(view) {
   const titles = {
     dashboard: 'Dashboard',
-    agendar: 'Agendar',
-    fechar: 'Fechar',
+    agendar: 'Novo Atendimento',
+    fechar: 'Fechamento',
     quinzenal: 'Relatórios',
     perfil: 'Perfil'
   }

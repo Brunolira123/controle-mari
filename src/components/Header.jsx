@@ -31,8 +31,23 @@ function Header({ title, onBack, showDate = true, showTime = true, showPeriod = 
 
         {/* TÍTULO PRINCIPAL */}
         <div className="header-main">
-          <div className="header-icon-container">
-            <div className="header-icon">✂️</div>
+          <div className="header-logo-container">
+            {/* LOGO COM A IMAGEM */}
+            <img 
+              src="/image.png" 
+              alt="Logo do Salão" 
+              className="header-logo"
+              onError={(e) => {
+                console.error('Erro ao carregar logo:', e)
+                e.target.style.display = 'none'
+                const fallback = e.target.parentElement.querySelector('.header-logo-fallback')
+                if (fallback) fallback.style.display = 'flex'
+              }}
+            />
+            {/* FALLBACK CASO A IMAGEM NÃO CARREGUE */}
+            <div className="header-logo-fallback">
+              ✂️
+            </div>
           </div>
           <div className="header-text">
             <h1 className="header-title">{title}</h1>
@@ -83,8 +98,6 @@ function Header({ title, onBack, showDate = true, showTime = true, showPeriod = 
           </div>
         </div>
       </div>
-
-      
     </header>
   )
 }
