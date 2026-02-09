@@ -4,18 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
+  <!-- ✅ Meta tags para prevenir cache -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <!-- Meta tags PWA -->
   <meta name="theme-color" content="#8b5cf6">
   <meta name="description" content="Sistema de gestão para salões de beleza">
   
-  <!-- iOS SPECIFIC - CRÍTICO PARA IPHONE -->
+  <!-- ✅ iOS SPECIFIC - CORRIGIDO -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="App Mari">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
   
-  <!-- Apple Touch Icons - caminhos relativos -->
+  <!-- ✅ Apple Touch Icons - caminhos ABSOLUTOS -->
+  <link rel="apple-touch-icon" href="/controle-mari/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="/controle-mari/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/controle-mari/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/controle-mari/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/controle-mari/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/controle-mari/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/controle-mari/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/controle-mari/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/controle-mari/apple-touch-icon-180x180.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
   <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
   <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
@@ -24,17 +41,17 @@
   <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
   
-  <!-- Favicon geral -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <!-- ✅ Favicon geral - caminhos ABSOLUTOS -->
+  <link rel="icon" type="image/x-icon" href="/controle-mari/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/controle-mari/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/controle-mari/favicon-16x16.png">
   
-  <!-- PWA Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png">
+  <!-- ✅ PWA Icons - caminhos ABSOLUTOS -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/controle-mari/pwa-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/controle-mari/pwa-512x512.png">
   
-  <!-- Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- ✅ Manifest com crossorigin -->
+  <link rel="manifest" href="/controle-mari/manifest.webmanifest" crossorigin="use-credentials">
   
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,10 +59,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <title>App Mari - Controle Salão</title>
+  
+  <!-- ✅ Script para forçar update do Service Worker -->
+  <script>
+    // Remove Service Workers antigos imediatamente
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        // Primeiro, remove todos os antigos
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            console.log('🗑️  Removendo SW antigo:', registration.scope);
+            registration.unregister();
+          }
+        }).then(function() {
+          // Depois registra o novo
+          navigator.serviceWorker.register('/controle-mari/sw.js')
+            .then(function(registration) {
+              console.log('✅ SW registrado com sucesso:', registration.scope);
+              
+              // Força update imediato
+              registration.update();
+              
+              // Monitora quando novo SW está pronto
+              if (registration.waiting) {
+                console.log('🔄 Novo SW esperando, forçando ativação...');
+                registration.waiting.postMessage({type: 'SKIP_WAITING'});
+              }
+            })
+            .catch(function(error) {
+              console.log('❌ Falha ao registrar SW:', error);
+            });
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <div id="root"></div>
-  <!-- O Vite vai injetar o caminho correto automaticamente -->
+  
+  <!-- ✅ Vite injeta aqui -->
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

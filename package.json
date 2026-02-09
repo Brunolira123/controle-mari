@@ -10,7 +10,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:gh": "vite build --base=/controle-mari/",
-    "deploy": "npm run build:gh && gh-pages -d dist",
+    "predeploy": "npm run build:gh && echo '' > dist/.nojekyll",
+    "deploy": "gh-pages -d dist --branch gh-pages --dotfiles --force",
     "lint": "eslint .",
     "generate-icons": "node scripts/generate-icons.cjs"
   },

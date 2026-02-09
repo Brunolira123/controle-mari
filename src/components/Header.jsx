@@ -1,16 +1,25 @@
 // src/components/Header.jsx
 import './Header.css'
 
-function Header({ title, onBack, showDate = true, showTime = true, showPeriod = true }) {
+// ✅ Caminho correto para GitHub Pages + PWA + iOS
+const logoImage = `${import.meta.env.BASE_URL}image.png`
+
+function Header({
+  title,
+  onBack,
+  showDate = true,
+  showTime = true,
+  showPeriod = true
+}) {
   const hoje = new Date()
-  
+
   const dataFormatada = hoje.toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   })
-  
+
   const horaFormatada = hoje.toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit'
@@ -21,6 +30,7 @@ function Header({ title, onBack, showDate = true, showTime = true, showPeriod = 
   return (
     <header className="header">
       <div className="header-content">
+
         {/* BOTÃO VOLTAR */}
         {onBack && (
           <button onClick={onBack} className="header-back-button">
@@ -29,74 +39,93 @@ function Header({ title, onBack, showDate = true, showTime = true, showPeriod = 
           </button>
         )}
 
-        {/* TÍTULO PRINCIPAL */}
+        {/* HEADER PRINCIPAL */}
         <div className="header-main">
           <div className="header-logo-container">
-            {/* LOGO COM A IMAGEM */}
-            <img 
-              src="/image.png" 
-              alt="Logo do Salão" 
+
+            {/* ✅ LOGO FUNCIONA EM PC + iOS + PWA */}
+            <img
+              src={logoImage}
+              alt="Logo do Salão"
               className="header-logo"
+              loading="eager"
               onError={(e) => {
-                console.error('Erro ao carregar logo:', e)
-                e.target.style.display = 'none'
-                const fallback = e.target.parentElement.querySelector('.header-logo-fallback')
+                console.error('Erro ao carregar logo:', logoImage)
+                e.currentTarget.style.display = 'none'
+
+                const fallback =
+                  e.currentTarget.parentElement.querySelector(
+                    '.header-logo-fallback'
+                  )
+
                 if (fallback) fallback.style.display = 'flex'
               }}
             />
-            {/* FALLBACK CASO A IMAGEM NÃO CARREGUE */}
-            <div className="header-logo-fallback">
+
+            {/* FALLBACK (só aparece se REALMENTE quebrar) */}
+            <div
+              className="header-logo-fallback"
+              aria-hidden="true"
+              style={{ display: 'none' }}
+            >
               ✂️
             </div>
           </div>
+
           <div className="header-text">
             <h1 className="header-title">{title}</h1>
-            
-            {/* INFORMAÇÕES ADICIONAIS */}
+
             {(showDate || showTime || showPeriod) && (
               <div className="header-info">
+
                 {showDate && (
                   <div className="info-item">
                     <span className="info-icon">📅</span>
                     <span className="info-text">{dataFormatada}</span>
                   </div>
                 )}
-                
+
                 {showTime && (
                   <div className="info-item">
                     <span className="info-icon">🕐</span>
                     <span className="info-text">{horaFormatada}</span>
                   </div>
                 )}
-                
+
                 {showPeriod && (
                   <div className="info-item">
                     <span className="info-icon">📊</span>
                     <span className="info-text">{periodo}</span>
                   </div>
                 )}
+
               </div>
             )}
           </div>
         </div>
 
-        {/* STATS RÁPIDOS (opcional) */}
+        {/* STATS RÁPIDOS */}
         <div className="header-stats">
           <div className="stat-item">
             <div className="stat-icon">💼</div>
             <div className="stat-label">Atend.</div>
           </div>
+
           <div className="stat-divider" />
+
           <div className="stat-item">
             <div className="stat-icon">💰</div>
             <div className="stat-label">Comiss.</div>
           </div>
+
           <div className="stat-divider" />
+
           <div className="stat-item">
             <div className="stat-icon">📈</div>
             <div className="stat-label">Relat.</div>
           </div>
         </div>
+
       </div>
     </header>
   )
