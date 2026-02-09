@@ -1,9 +1,10 @@
-// src/components/ServiceForm.jsx - VERSÃO CORRIGIDA E MELHORADA
+// src/components/ServiceForm.jsx - VERSÃO 100% ATUALIZADA
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
 import ClientSelector from './ClientSelector.jsx'
 import Modal from './Modal.jsx'
 import ProfissionalCadastro from './ProfissionalCadastro.jsx'
+import ServiceModal from './ServiceModal.jsx'
 import './ServiceForm.css'
 
 export function ServiceForm({ onSuccess, user }) {
@@ -42,13 +43,6 @@ export function ServiceForm({ onSuccess, user }) {
   const [novoCliente, setNovoCliente] = useState({
     nome: '',
     telefone: ''
-  })
-
-  // Formulário para novo serviço
-  const [novoServico, setNovoServico] = useState({
-    nome: '',
-    comissao_salao: '',
-    comissao_indicacao: ''
   })
 
   useEffect(() => {
@@ -147,46 +141,15 @@ export function ServiceForm({ onSuccess, user }) {
     }
   }
 
-  // Função para cadastrar novo serviço
-  async function cadastrarServico() {
-    if (!novoServico.nome.trim()) {
-      alert('Nome do serviço é obrigatório!')
-      return
-    }
-
-    if (!novoServico.comissao_salao || !novoServico.comissao_indicacao) {
-      alert('Preencha os valores de comissão!')
-      return
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('servicos')
-        .insert({
-          nome: novoServico.nome,
-          comissao_salao: parseFloat(novoServico.comissao_salao),
-          comissao_indicacao: parseFloat(novoServico.comissao_indicacao)
-        })
-        .select()
-      
-      if (error) throw error
-
-      if (data && data[0]) {
-        await loadServicos()
-        setForm({ ...form, servico_id: data[0].id })
-        setNovoServico({ nome: '', comissao_salao: '', comissao_indicacao: '' })
-        setShowServicoModal(false)
-        alert('✅ Serviço cadastrado com sucesso!')
-      }
-    } catch (error) {
-      alert('❌ Erro ao cadastrar serviço: ' + error.message)
-      console.error('Erro detalhado:', error)
-    }
-  }
-
   // Função para recarregar profissionais após cadastro
   const handleProfissionalCadastrado = () => {
     loadProfissionais()
+  }
+
+  // Função para lidar com serviço criado
+  const handleServicoCriado = (novoServico) => {
+    loadServicos()
+    setForm(prev => ({ ...prev, servico_id: novoServico.id }))
   }
 
   async function handleSubmit(e) {
@@ -280,85 +243,56 @@ export function ServiceForm({ onSuccess, user }) {
         onSuccess={handleProfissionalCadastrado}
       />
 
-      {/* MODAL CADASTRO SERVIÇO */}
-      <Modal 
+      {/* MODAL CADASTRO SERVIÇO - COMPONENTE SEPARADO */}
+      <ServiceModal
         isOpen={showServicoModal}
         onClose={() => setShowServicoModal(false)}
-        title="💇 Cadastrar Novo Serviço"
+        onServiceCreated={handleServicoCriado}
+      />
+
+      {/* MODAL CADASTRO CLIENTE */}
+      <Modal 
+        isOpen={showClienteModal}
+        onClose={() => setShowClienteModal(false)}
+        title="👤 Cadastrar Novo Cliente"
       >
         <div className="modal-form">
           <div className="modal-field">
-            <label>Nome do Serviço *</label>
+            <label>Nome do Cliente *</label>
             <input
               type="text"
-              value={novoServico.nome}
-              onChange={e => setNovoServico({...novoServico, nome: e.target.value})}
-              placeholder="Ex: Corte Masculino, Luzes, Progressiva"
+              value={novoCliente.nome}
+              onChange={e => setNovoCliente({...novoCliente, nome: e.target.value})}
+              placeholder="Nome completo"
               className="modal-input"
               required
               autoFocus
             />
           </div>
           
-          <div className="modal-comissao-group">
-            <div className="modal-comissao-field">
-              <label>
-                <span className="comissao-icon">💈</span>
-                Comissão Salão (R$) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={novoServico.comissao_salao}
-                onChange={e => setNovoServico({...novoServico, comissao_salao: e.target.value})}
-                placeholder="0.00"
-                className="modal-input comissao-input"
-                required
-              />
-            </div>
-            
-            <div className="modal-comissao-field">
-              <label>
-                <span className="comissao-icon">👥</span>
-                Comissão Indicação (R$) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={novoServico.comissao_indicacao}
-                onChange={e => setNovoServico({...novoServico, comissao_indicacao: e.target.value})}
-                placeholder="0.00"
-                className="modal-input comissao-input"
-                required
-              />
-            </div>
+          <div className="modal-field">
+            <label>Telefone (opcional)</label>
+            <input
+              type="tel"
+              value={novoCliente.telefone}
+              onChange={e => setNovoCliente({...novoCliente, telefone: e.target.value})}
+              placeholder="(11) 99999-9999"
+              className="modal-input"
+            />
           </div>
-          
-          {novoServico.comissao_salao && novoServico.comissao_indicacao && (
-            <div className="comissao-diferenca-card">
-              <div className="comissao-diferenca-header">
-                <span className="diferenca-icon">📈</span>
-                <span className="diferenca-title">Diferença de Comissão</span>
-              </div>
-              <div className="comissao-diferenca-valor">
-                Indicação paga <strong>R$ {(parseFloat(novoServico.comissao_indicacao) - parseFloat(novoServico.comissao_salao)).toFixed(2)} a mais</strong>
-              </div>
-            </div>
-          )}
           
           <div className="modal-actions">
             <button
-              onClick={cadastrarServico}
+              onClick={cadastrarCliente}
+              disabled={!novoCliente.nome.trim()}
               className="modal-submit-button"
             >
               <span className="modal-submit-icon">➕</span>
-              Cadastrar Serviço
+              Cadastrar Cliente
             </button>
             
             <button
-              onClick={() => setShowServicoModal(false)}
+              onClick={() => setShowClienteModal(false)}
               className="modal-cancel-button"
             >
               Cancelar

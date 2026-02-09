@@ -734,3 +734,608 @@
 .form-input:valid, .form-select:valid {
   border-color: #10b981;
 }
+
+/* MODAL PREMIUM - ESTILOS PROFISSIONAIS */
+
+/* HEADER DO MODAL */
+.modal-premium-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-premium-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.modal-premium-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.modal-premium-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* FORMULÁRIO */
+.modal-premium-content {
+  padding: 0;
+}
+
+.modal-premium-form {
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.modal-premium-field {
+  margin-bottom: 20px;
+}
+
+.modal-premium-field:last-child {
+  margin-bottom: 0;
+}
+
+.modal-premium-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.required-badge {
+  color: #ef4444;
+  font-size: 16px;
+}
+
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #6b7280;
+  z-index: 1;
+}
+
+.input-suffix {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.modal-premium-input {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  font-size: 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+  color: #1f2937;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modal-premium-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* SEÇÃO DE COMISSÕES */
+.modal-premium-section {
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-icon {
+  font-size: 20px;
+}
+
+.section-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.badge-salao {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-indicacao {
+  background: linear-gradient(135deg, #f0fff4 0%, #e6fff0 100%);
+  color: #10b981;
+  border: 1px solid #a7f3d0;
+}
+
+/* CARDS DE COMISSÃO */
+.comissao-grid-premium {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.comissao-card-premium {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.comissao-card-premium:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.comissao-card-header-premium {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comissao-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comissao-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.comissao-card-info-premium {
+  flex: 1;
+}
+
+.comissao-card-title-premium {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.comissao-card-percent-premium {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.comissao-card-body-premium {
+  text-align: center;
+}
+
+.comissao-valor-display {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.comissao-valor-prefix {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.comissao-valor {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.comissao-progress {
+  margin-bottom: 16px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: right;
+}
+
+.comissao-footer-premium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.footer-icon {
+  font-size: 14px;
+}
+
+/* DIFERENÇA */
+.diferenca-premium {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.diferenca-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.diferenca-icon {
+  font-size: 20px;
+  color: #d97706;
+}
+
+.diferenca-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.diferenca-content {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.diferenca-valor {
+  font-size: 24px;
+  font-weight: 800;
+  color: #92400e;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(146, 64, 14, 0.1);
+}
+
+.diferenca-text {
+  font-size: 14px;
+  color: #92400e;
+  flex: 1;
+}
+
+/* BOTÕES */
+.modal-premium-actions {
+  display: flex;
+  gap: 12px;
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-premium {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-primary-premium {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary-premium:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary-premium:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary-premium {
+  background: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-secondary-premium:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+/* RODAPÉ */
+.modal-premium-footer {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.footer-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.footer-info-icon {
+  font-size: 18px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.footer-info-content {
+  flex: 1;
+}
+
+.footer-info-content p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.footer-info-content strong {
+  color: #374151;
+}
+
+/* RESPONSIVIDADE AVANÇADA */
+@media (max-width: 768px) {
+  .modal-premium-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .modal-premium-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+  
+  .modal-premium-form {
+    padding: 20px;
+  }
+  
+  .modal-premium-input {
+    padding: 16px 16px 16px 44px;
+    font-size: 16px;
+  }
+  
+  .modal-premium-section {
+    padding: 20px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section-badges {
+    justify-content: center;
+  }
+  
+  .comissao-grid-premium {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .comissao-card-premium {
+    padding: 16px;
+  }
+  
+  .comissao-valor-display {
+    font-size: 24px;
+  }
+  
+  .modal-premium-actions {
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .btn-premium {
+    width: 100%;
+  }
+  
+  .diferenca-content {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .diferenca-valor {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-premium-form,
+  .modal-premium-section,
+  .modal-premium-actions,
+  .modal-premium-footer {
+    padding: 16px;
+  }
+  
+  .modal-premium-title {
+    font-size: 18px;
+  }
+  
+  .modal-premium-input {
+    font-size: 15px;
+  }
+  
+  .comissao-card-header-premium {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .comissao-card-info-premium {
+    text-align: center;
+  }
+  
+  .comissao-valor-display {
+    font-size: 22px;
+  }
+  
+  .diferenca-valor {
+    font-size: 20px;
+    padding: 6px 12px;
+  }
+}
+
+/* ANIMAÇÕES */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comissao-card-premium {
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.comissao-card-premium:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+/* ESTADOS DE FOCO */
+.modal-premium-input:focus {
+  animation: inputFocus 0.3s ease;
+}
+
+@keyframes inputFocus {
+  0% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}
+
+/* SCROLL PERSONALIZADO */
+.modal-premium-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-premium-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-premium-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+.modal-premium-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b21a8 100%);
+}
