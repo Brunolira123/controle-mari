@@ -84,14 +84,6 @@ function Header({
                     <span className="info-text">{dataFormatada}</span>
                   </div>
                 )}
-
-                {showTime && (
-                  <div className="info-item">
-                    <span className="info-icon">🕐</span>
-                    <span className="info-text">{horaFormatada}</span>
-                  </div>
-                )}
-
                 {showPeriod && (
                   <div className="info-item">
                     <span className="info-icon">📊</span>

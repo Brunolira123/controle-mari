@@ -4,9 +4,14 @@ import './VisitasModal.css'
 
 function VisitasModal({ onClose, onRefresh }) {
   const [visitas, setVisitas] = useState([])
+  const [visitasFiltradas, setVisitasFiltradas] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVisita, setEditingVisita] = useState(null)
+  const [filtroMes, setFiltroMes] = useState('')
+  const [filtroAno, setFiltroAno] = useState(new Date().getFullYear().toString())
+  const [modoRelatorio, setModoRelatorio] = useState(false)
+  const [estatisticasDetalhadas, setEstatisticasDetalhadas] = useState(null)
 
   // Form state
   const [form, setForm] = useState({
@@ -16,9 +21,35 @@ function VisitasModal({ onClose, onRefresh }) {
     observacoes: ''
   })
 
+  // Gerar anos (3 anos atrás até ano atual)
+  const anosDisponiveis = Array.from({ length: 4 }, (_, i) => 
+    (new Date().getFullYear() - 3 + i).toString()
+  )
+
+  // Meses para filtro
+  const meses = [
+    { value: '', label: 'Todos os meses' },
+    { value: '01', label: 'Janeiro' },
+    { value: '02', label: 'Fevereiro' },
+    { value: '03', label: 'Março' },
+    { value: '04', label: 'Abril' },
+    { value: '05', label: 'Maio' },
+    { value: '06', label: 'Junho' },
+    { value: '07', label: 'Julho' },
+    { value: '08', label: 'Agosto' },
+    { value: '09', label: 'Setembro' },
+    { value: '10', label: 'Outubro' },
+    { value: '11', label: 'Novembro' },
+    { value: '12', label: 'Dezembro' }
+  ]
+
   useEffect(() => {
     carregarVisitas()
   }, [])
+
+  useEffect(() => {
+    aplicarFiltros()
+  }, [visitas, filtroMes, filtroAno])
 
   async function carregarVisitas() {
     setLoading(true)
@@ -31,13 +62,83 @@ function VisitasModal({ onClose, onRefresh }) {
       if (error) throw error
 
       setVisitas(data || [])
+      setVisitasFiltradas(data || [])
     } catch (error) {
       console.error('Erro ao carregar visitas:', error)
       alert('Erro ao carregar visitas')
       setVisitas([])
+      setVisitasFiltradas([])
     } finally {
       setLoading(false)
     }
+  }
+
+  function aplicarFiltros() {
+    let filtradas = [...visitas]
+    
+    // Filtrar por ano
+    if (filtroAno) {
+      filtradas = filtradas.filter(v => 
+        v.data_visita && v.data_visita.startsWith(filtroAno)
+      )
+    }
+    
+    // Filtrar por mês
+    if (filtroMes) {
+      filtradas = filtradas.filter(v => 
+        v.data_visita && v.data_visita.substring(5, 7) === filtroMes
+      )
+    }
+    
+    setVisitasFiltradas(filtradas)
+    calcularEstatisticasDetalhadas(filtradas)
+  }
+
+  function calcularEstatisticasDetalhadas(listaVisitas) {
+    if (!listaVisitas.length) {
+      setEstatisticasDetalhadas(null)
+      return
+    }
+
+    const stats = {
+      total: listaVisitas.length,
+      fechadas: listaVisitas.filter(v => v.fechou_contrato === true).length,
+      nao_fechou: listaVisitas.filter(v => v.fechou_contrato === false).length,
+      abertas: listaVisitas.filter(v => v.fechou_contrato === null).length,
+      taxaConversao: listaVisitas.length > 0 ? 
+        ((listaVisitas.filter(v => v.fechou_contrato === true).length / listaVisitas.length) * 100).toFixed(1) : 0
+    }
+
+    // Calcular por mês
+    const porMes = {}
+    listaVisitas.forEach(visita => {
+      if (visita.data_visita) {
+        const mesAno = visita.data_visita.substring(0, 7) // YYYY-MM
+        if (!porMes[mesAno]) {
+          porMes[mesAno] = { total: 0, fechadas: 0, naoFechou: 0, abertas: 0 }
+        }
+        porMes[mesAno].total++
+        
+        if (visita.fechou_contrato === true) porMes[mesAno].fechadas++
+        else if (visita.fechou_contrato === false) porMes[mesAno].naoFechou++
+        else porMes[mesAno].abertas++
+      }
+    })
+
+    // Calcular ticket médio (se houver valor_fechado no futuro)
+    // const tickets = listaVisitas.filter(v => v.valor_fechado).map(v => v.valor_fechado)
+    // const ticketMedio = tickets.length ? 
+    //   (tickets.reduce((a, b) => a + b, 0) / tickets.length).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
+
+    setEstatisticasDetalhadas({
+      ...stats,
+      porMes: Object.entries(porMes).map(([mesAno, dados]) => ({
+        mesAno,
+        ...dados,
+        taxa: ((dados.fechadas / dados.total) * 100).toFixed(1)
+      })).sort((a, b) => b.mesAno.localeCompare(a.mesAno))
+      // ticketMedio
+    })
   }
 
   async function salvarVisita(e) {
@@ -50,7 +151,7 @@ function VisitasModal({ onClose, onRefresh }) {
         contato: form.contato || null,
         data_visita: form.data_visita,
         observacoes: form.observacoes || null,
-        fechou_contrato: null // SEMPRE inicia como NULL (sem resposta)
+        fechou_contrato: null
       }
 
       if (editingVisita) {
@@ -68,7 +169,6 @@ function VisitasModal({ onClose, onRefresh }) {
         if (error) throw error
       }
 
-      // Limpar form
       setForm({
         cliente_nome: '',
         contato: '',
@@ -88,6 +188,8 @@ function VisitasModal({ onClose, onRefresh }) {
       setLoading(false)
     }
   }
+
+  // ... manter funções deletarVisita, marcarComoFechada, marcarComoNaoFechou, voltarParaAberto ...
 
   async function deletarVisita(id) {
     if (!confirm('Tem certeza que deseja excluir esta visita?')) return
@@ -109,7 +211,6 @@ function VisitasModal({ onClose, onRefresh }) {
     }
   }
 
-  // FUNÇÕES PARA OS 3 ESTADOS
   async function marcarComoFechada(id) {
     if (!confirm('Marcar como CONTRATO FECHADO?\n\n✅ Cliente fechou serviço')) return
 
@@ -207,6 +308,12 @@ function VisitasModal({ onClose, onRefresh }) {
     return new Date(data).toLocaleDateString('pt-BR')
   }
 
+  function formatarMesAno(mesAno) {
+    const [ano, mes] = mesAno.split('-')
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+    return `${meses[parseInt(mes) - 1]}/${ano}`
+  }
+
   function getContatoIcon(contato) {
     if (!contato) return '📱'
     if (contato.includes('@')) return '📧'
@@ -224,44 +331,127 @@ function VisitasModal({ onClose, onRefresh }) {
     }
   }
 
-  // Calcular estatísticas
-  const stats = {
-    total: visitas.length,
-    fechadas: visitas.filter(v => v.fechou_contrato === true).length,
-    nao_fechou: visitas.filter(v => v.fechou_contrato === false).length,
-    abertas: visitas.filter(v => v.fechou_contrato === null).length,
-    hoje: visitas.filter(v => v.data_visita === new Date().toISOString().split('T')[0]).length,
-    taxaConversao: visitas.length > 0 ? 
-      ((visitas.filter(v => v.fechou_contrato === true).length / visitas.length) * 100).toFixed(1) : 0
+  function limparFiltros() {
+    setFiltroMes('')
+    setFiltroAno(new Date().getFullYear().toString())
+    setModoRelatorio(false)
+  }
+
+  function gerarRelatorioAnual() {
+    if (!visitas.length) {
+      alert('Não há visitas para gerar relatório')
+      return
+    }
+    
+    // Agrupar por ano
+    const porAno = {}
+    visitas.forEach(visita => {
+      if (visita.data_visita) {
+        const ano = visita.data_visita.substring(0, 4)
+        if (!porAno[ano]) {
+          porAno[ano] = { total: 0, fechadas: 0, naoFechou: 0, abertas: 0 }
+        }
+        porAno[ano].total++
+        
+        if (visita.fechou_contrato === true) porAno[ano].fechadas++
+        else if (visita.fechou_contrato === false) porAno[ano].naoFechou++
+        else porAno[ano].abertas++
+      }
+    })
+
+    let relatorio = '📊 RELATÓRIO ANUAL DE VISITAS\n\n'
+    relatorio += '='.repeat(50) + '\n\n'
+
+    Object.entries(porAno).sort(([anoA], [anoB]) => anoB.localeCompare(anoA)).forEach(([ano, dados]) => {
+      relatorio += `ANO: ${ano}\n`
+      relatorio += `📋 Total de visitas: ${dados.total}\n`
+      relatorio += `✅ Contratos fechados: ${dados.fechadas} (${((dados.fechadas / dados.total) * 100).toFixed(1)}%)\n`
+      relatorio += `❌ Não fecharam: ${dados.naoFechou}\n`
+      relatorio += `⏳ Em aberto: ${dados.abertas}\n`
+      relatorio += '-'.repeat(40) + '\n\n'
+    })
+
+    // Exibir em modal ou copiar para área de transferência
+    const novaJanela = window.open('', '_blank')
+    novaJanela.document.write(`<pre style="font-family: monospace; padding: 20px;">${relatorio}</pre>`)
+    novaJanela.document.close()
   }
 
   return (
     <div className="modal-overlay">
       <div className="modal-content visitas-modal">
         <div className="modal-header">
-          <h2>👥 Visitas</h2>
+          <h2>Visitas</h2>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
 
-        {/* ESTATÍSTICAS */}
-        <div className="visitas-stats">
-          <div className="visita-stat">
-            <div className="stat-number">{stats.total}</div>
-            <div className="stat-label">Total</div>
-          </div>
-          <div className="visita-stat">
-            <div className="stat-number">{stats.fechadas}</div>
-            <div className="stat-label">Fechadas</div>
-          </div>
-          <div className="visita-stat">
-            <div className="stat-number">{stats.nao_fechou}</div>
-            <div className="stat-label">Não Fechou</div>
-          </div>
-          <div className="visita-stat">
-            <div className="stat-number">{stats.taxaConversao}%</div>
-            <div className="stat-label">Conversão</div>
+        {/* FILTROS E CONTROLES */}
+        <div className="filtros-container">
+          <div className="filtros-grid">
+            <div className="filtro-group">
+              <label>Ano</label>
+              <select 
+                value={filtroAno} 
+                onChange={e => setFiltroAno(e.target.value)}
+                className="filtro-select"
+              >
+                {anosDisponiveis.map(ano => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="filtro-group">
+              <label>Mês</label>
+              <select 
+                value={filtroMes} 
+                onChange={e => setFiltroMes(e.target.value)}
+                className="filtro-select"
+              >
+                {meses.map(mes => (
+                  <option key={mes.value} value={mes.value}>{mes.label}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="filtro-actions">
+              <button 
+                onClick={limparFiltros}
+                className="btn-secondary"
+              >
+                🔄 Limpar
+              </button>
+              <button 
+                onClick={() => setModoRelatorio(!modoRelatorio)}
+                className={modoRelatorio ? 'btn-primary' : 'btn-secondary'}
+              >
+                📊 {modoRelatorio ? 'Ver Lista' : 'Ver Relatório'}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* ESTATÍSTICAS */}
+        {estatisticasDetalhadas && (
+          <div className="visitas-stats">
+            <div className="visita-stat">
+              <div className="stat-number">{estatisticasDetalhadas.total}</div>
+              <div className="stat-label">Total</div>
+            </div>
+            <div className="visita-stat">
+              <div className="stat-number">{estatisticasDetalhadas.fechadas}</div>
+              <div className="stat-label">Fechadas</div>
+            </div>
+            <div className="visita-stat">
+              <div className="stat-number">{estatisticasDetalhadas.nao_fechou}</div>
+              <div className="stat-label">Não Fechou</div>
+            </div>
+            <div className="visita-stat">
+              <div className="stat-number">{estatisticasDetalhadas.taxaConversao}%</div>
+              <div className="stat-label">Conversão</div>
+            </div>
+          </div>
+        )}
 
         {/* BOTÕES DE AÇÃO */}
         <div className="modal-actions">
@@ -277,6 +467,13 @@ function VisitasModal({ onClose, onRefresh }) {
             className="btn-secondary"
           >
             {loading ? '🔄' : '🔄'} Atualizar
+          </button>
+          <button 
+            onClick={gerarRelatorioAnual}
+            disabled={!visitas.length}
+            className="btn-secondary"
+          >
+            📈 Relatório Anual
           </button>
         </div>
 
@@ -356,34 +553,102 @@ function VisitasModal({ onClose, onRefresh }) {
           </form>
         )}
 
+        {/* MODO RELATÓRIO */}
+        {modoRelatorio && estatisticasDetalhadas && (
+          <div className="relatorio-container">
+            <h3>📈 Relatório Detalhado</h3>
+            {filtroMes ? (
+              <div className="relatorio-mes">
+                <h4>📅 {meses.find(m => m.value === filtroMes)?.label} de {filtroAno}</h4>
+                <div className="relatorio-grid">
+                  <div className="relatorio-card">
+                    <div className="relatorio-valor">{estatisticasDetalhadas.total}</div>
+                    <div className="relatorio-label">Visitas</div>
+                  </div>
+                  <div className="relatorio-card">
+                    <div className="relatorio-valor">{estatisticasDetalhadas.fechadas}</div>
+                    <div className="relatorio-label">Fechadas</div>
+                  </div>
+                  <div className="relatorio-card">
+                    <div className="relatorio-valor">{estatisticasDetalhadas.taxaConversao}%</div>
+                    <div className="relatorio-label">Taxa Conversão</div>
+                  </div>
+                </div>
+              </div>
+            ) : estatisticasDetalhadas.porMes.length > 0 ? (
+              <div className="relatorio-anual">
+                <h4>📊 Evolução Mensal - {filtroAno}</h4>
+                <div className="tabela-relatorio">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Mês</th>
+                        <th>Total</th>
+                        <th>✅ Fechadas</th>
+                        <th>❌ Não Fechou</th>
+                        <th>⏳ Em Aberto</th>
+                        <th>Taxa</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {estatisticasDetalhadas.porMes.map((mes, index) => (
+                        <tr key={index}>
+                          <td>{formatarMesAno(mes.mesAno)}</td>
+                          <td>{mes.total}</td>
+                          <td>{mes.fechadas}</td>
+                          <td>{mes.naoFechou}</td>
+                          <td>{mes.abertas}</td>
+                          <td>{mes.taxa}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="empty-state">
+                Nenhum dado disponível para o período selecionado
+              </div>
+            )}
+          </div>
+        )}
+
         {/* LISTA DE VISITAS */}
-        {!showForm && (
+        {!showForm && !modoRelatorio && (
           <div className="visitas-list">
             <div className="list-header">
-              <h3>Visitas ({visitas.length})</h3>
+              <h3>Visitas ({visitasFiltradas.length})
+                {filtroMes && ` - ${meses.find(m => m.value === filtroMes)?.label}`}
+                {` - ${filtroAno}`}
+              </h3>
               <div className="list-filters">
                 <span className="filter-info">
-                  {stats.abertas} em aberto • {stats.fechadas} fechadas • {stats.nao_fechou} não fechou
+                  {estatisticasDetalhadas?.abertas || 0} em aberto • 
+                  {estatisticasDetalhadas?.fechadas || 0} fechadas • 
+                  {estatisticasDetalhadas?.nao_fechou || 0} não fechou
                 </span>
               </div>
             </div>
             
             {loading ? (
               <div className="loading">Carregando visitas...</div>
-            ) : visitas.length === 0 ? (
+            ) : visitasFiltradas.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">📭</div>
-                <p>Nenhuma visita cadastrada</p>
-                <button 
-                  onClick={() => setShowForm(true)}
-                  className="btn-primary"
-                >
-                  ➕ Criar Primeira Visita
-                </button>
+                <p>Nenhuma visita encontrada</p>
+                {filtroMes || filtroAno !== new Date().getFullYear().toString() ? (
+                  <button onClick={limparFiltros} className="btn-primary">
+                    🔄 Limpar Filtros
+                  </button>
+                ) : (
+                  <button onClick={() => setShowForm(true)} className="btn-primary">
+                    ➕ Criar Primeira Visita
+                  </button>
+                )}
               </div>
             ) : (
               <div className="visitas-cards">
-                {visitas.map(visita => {
+                {visitasFiltradas.map(visita => {
                   const hoje = new Date().toISOString().split('T')[0]
                   const isHoje = visita.data_visita === hoje
                   const status = getStatusVisita(visita)
@@ -430,9 +695,7 @@ function VisitasModal({ onClose, onRefresh }) {
                           ✏️
                         </button>
                         
-                        {/* BOTÕES DE STATUS */}
                         {visita.fechou_contrato === null ? (
-                          // EM ABERTO: pode marcar como FECHADO ou NÃO FECHOU
                           <>
                             <button 
                               onClick={() => marcarComoFechada(visita.id)}
@@ -450,7 +713,6 @@ function VisitasModal({ onClose, onRefresh }) {
                             </button>
                           </>
                         ) : (
-                          // JÁ RESPONDIDO (true ou false): pode voltar para EM ABERTO
                           <button 
                             onClick={() => voltarParaAberto(visita.id)}
                             className="action-btn warning"
@@ -461,11 +723,7 @@ function VisitasModal({ onClose, onRefresh }) {
                         )}
                         
                         <button 
-                          onClick={() => {
-                            if (confirm('Tem certeza que deseja excluir esta visita?')) {
-                              deletarVisita(visita.id)
-                            }
-                          }}
+                          onClick={() => deletarVisita(visita.id)}
                           className="action-btn delete"
                           title="🗑️ Excluir"
                         >
