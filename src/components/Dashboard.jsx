@@ -118,7 +118,7 @@ function Dashboard({ onNavigate, user }) {
       id: 'visitas',
       label: 'Visitas',
       icon: '👥',
-      desc: 'Prospecção',
+      desc: '',
       onClick: () => setShowVisitasModal(true)
     },
     {
@@ -211,7 +211,7 @@ function Dashboard({ onNavigate, user }) {
         {/* RESUMO VISITAS - SÓ APARECE SE TIVER VISITAS */}
         {stats.visitasTotal > 0 && (
           <div className="visitas-resumo">
-            <h3 className="section-title">Visitas de Prospecção</h3>
+            <h3 className="section-title">Visitas</h3>
             <div className="visitas-resumo-stats">
               <div className="visita-resumo-item aberto" onClick={() => setShowVisitasModal(true)}>
                 <div className="resumo-icone">⏳</div>

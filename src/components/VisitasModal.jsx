@@ -239,7 +239,7 @@ function VisitasModal({ onClose, onRefresh }) {
     <div className="modal-overlay">
       <div className="modal-content visitas-modal">
         <div className="modal-header">
-          <h2>👥 Visitas de Prospecção</h2>
+          <h2>👥 Visitas</h2>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
 

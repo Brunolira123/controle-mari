@@ -1,6 +1,7 @@
 // src/components/QuinzenalReportMobile.jsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase.js'
+import jsPDF from 'jspdf'
 import './QuinzenalReportMobile.css'
 
 export function QuinzenalReportMobile() {
@@ -10,7 +11,8 @@ export function QuinzenalReportMobile() {
   const [loading, setLoading] = useState(false)
   const [resumoDiario, setResumoDiario] = useState([])
   const [expandedDay, setExpandedDay] = useState(null)
-  const [viewMode, setViewMode] = useState('cards') // 'cards' ou 'text'
+  const [viewMode, setViewMode] = useState('cards')
+  const [generatingPDF, setGeneratingPDF] = useState(false)
 
   const anos = [2023, 2024, 2025, 2026, 2027]
   const meses = [
@@ -28,30 +30,80 @@ export function QuinzenalReportMobile() {
     {id: 12, nome: 'Dez'}
   ]
 
-  // FUNÇÃO CORRIGIDA para obter data atual corretamente
   function getCurrentPeriod() {
     const hoje = new Date()
     const dia = hoje.getDate()
     return dia <= 15 ? 1 : 2
   }
 
-  // FUNÇÃO AUXILIAR CORRIGIDA para formatar datas
+  // Função para verificar se uma data existe
+  function dataExiste(year, month, day) {
+    const date = new Date(year, month - 1, day)
+    return date.getFullYear() === year && 
+           date.getMonth() === month - 1 && 
+           date.getDate() === day
+  }
+
+  // Função para obter o último dia válido de um mês
+  function getUltimoDiaMes(year, month) {
+    return new Date(year, month, 0).getDate()
+  }
+
+  // FUNÇÃO SEGURA para obter datas do período
+  function getPeriodDates(period, year, month) {
+    const mesStr = month.toString().padStart(2, '0')
+    const anoStr = year.toString().slice(2, 4)
+    
+    if (period === 1) {
+      // 1ª Quinzena: 01 a 15 (sempre válido)
+      return {
+        inicio: `${year}-${mesStr}-01`,
+        fim: `${year}-${mesStr}-15`,
+        label: `01/${mesStr}/${anoStr} a 15/${mesStr}/${anoStr}`,
+        labelShort: `1ª Quinzena`,
+        periodo: 1
+      }
+    } else {
+      // 2ª Quinzena: Lógica inteligente
+      const ultimoDiaReal = getUltimoDiaMes(year, month)
+      
+      // Se o mês tem menos de 30 dias (fevereiro), ajusta
+      if (ultimoDiaReal < 30) {
+        // Para meses com menos de 30 dias, 2ª quinzena é 16 até o último dia
+        return {
+          inicio: `${year}-${mesStr}-16`,
+          fim: `${year}-${mesStr}-${ultimoDiaReal.toString().padStart(2, '0')}`,
+          label: `16/${mesStr}/${anoStr} a ${ultimoDiaReal}/${mesStr}/${anoStr}`,
+          labelShort: `2ª Quinzena`,
+          periodo: 2,
+          temApenas16aUltimo: true
+        }
+      } else {
+        // Para meses com 30+ dias, 2ª quinzena é 16 a 30 (ignora 31)
+        return {
+          inicio: `${year}-${mesStr}-16`,
+          fim: `${year}-${mesStr}-30`,
+          label: `16/${mesStr}/${anoStr} a 30/${mesStr}/${anoStr}`,
+          labelShort: `2ª Quinzena`,
+          periodo: 2,
+          temApenas16a30: true
+        }
+      }
+    }
+  }
+
   const formatarDataSegura = (dataString, opcoes = {}) => {
     if (!dataString) return 'Sem data'
     
     try {
-      // Divide a string ISO "YYYY-MM-DD"
       const [ano, mes, dia] = dataString.split('-').map(Number)
       
-      // Validação
-      if (isNaN(ano) || isNaN(mes) || isNaN(dia)) {
+      if (!dataExiste(ano, mes, dia)) {
         return dataString
       }
       
-      // Cria data LOCAL (evita timezone bugs)
       const data = new Date(ano, mes - 1, dia)
       
-      // Opções padrão para exibição
       const opcoesPadrao = {
         day: '2-digit',
         month: '2-digit',
@@ -66,7 +118,6 @@ export function QuinzenalReportMobile() {
     }
   }
 
-  // Função para datas curtas (dia/mês)
   const formatarDataCurta = (dataString) => {
     if (!dataString) return ''
     
@@ -78,35 +129,161 @@ export function QuinzenalReportMobile() {
     }
   }
 
-  // FUNÇÃO CORRIGIDA para datas do período
-  function getPeriodDates(period, year, month) {
-    const mesStr = month.toString().padStart(2, '0')
+  // FUNÇÃO ROBUSTA para carregar relatório
+  async function carregarRelatorio() {
+    setLoading(true)
     
-    if (period === 1) {
-      return {
-        inicio: `${year}-${mesStr}-01`,
-        fim: `${year}-${mesStr}-15`,
-        label: `01/${mesStr}/${year} a 15/${mesStr}/${year}`,
-        labelShort: `1ª Quinzena`
+    try {
+      const { inicio, fim, periodo: periodoAtual, temApenas16a30, temApenas16aUltimo } = getPeriodDates(periodo, ano, mes)
+      
+      console.log('📅 Período selecionado:', {
+        periodo: periodoAtual,
+        inicio,
+        fim,
+        mes,
+        ano
+      })
+
+      let todosDados = []
+
+      // ESTRATÉGIA 1: Busca normal (para períodos com datas válidas)
+      try {
+        console.log('🔍 Tentando busca normal...')
+        const { data: dadosBusca, error } = await supabase
+          .from('agendamentos')
+          .select(`
+            *,
+            clientes!inner(nome),
+            servicos!inner(nome, comissao_salao, comissao_indicacao)
+          `)
+          .eq('status', 'realizado')
+          .gte('data', inicio)
+          .lte('data', fim)
+          .order('data', { ascending: true })
+
+        if (error) {
+          console.warn('⚠️ Erro na busca normal:', error.message)
+          throw error // Força ir para a estratégia 2
+        }
+
+        todosDados = dadosBusca || []
+        console.log(`✅ Busca normal: ${todosDados.length} registros`)
+
+      } catch (erroBusca) {
+        console.log('🔄 Busca normal falhou, usando estratégia alternativa...')
+        
+        // ESTRATÉGIA 2: Busca por dias individuais (à prova de erros)
+        todosDados = await buscarPorDiasIndividuais()
       }
-    } else {
-      const ultimoDia = new Date(year, month, 0).getDate()
-      return {
-        inicio: `${year}-${mesStr}-16`,
-        fim: `${year}-${mesStr}-${ultimoDia.toString().padStart(2, '0')}`,
-        label: `16/${mesStr}/${year} a ${ultimoDia}/${mesStr}/${year}`,
-        labelShort: `2ª Quinzena`
+
+      // APLICA REGRAS DE FILTRAGEM ESPECÍFICAS
+      if (periodoAtual === 2) {
+        console.log('🔧 Aplicando filtros para 2ª quinzena...')
+        
+        if (temApenas16a30) {
+          // Filtra apenas dias 16-30 (remove qualquer 31)
+          const antes = todosDados.length
+          todosDados = todosDados.filter(item => {
+            const dia = parseInt(item.data.split('-')[2])
+            return dia >= 16 && dia <= 30
+          })
+          console.log(`🔧 Mantidos ${todosDados.length} de ${antes} registros (16-30)`)
+        } else if (temApenas16aUltimo) {
+          // Já está correto (16 até último dia do mês)
+          console.log(`🔧 Período já correto: 16 até ${getUltimoDiaMes(ano, mes)}`)
+        }
       }
+
+      // ADICIONA DIA 31 DO MÊS ANTERIOR (para 1ª quinzena)
+      if (periodoAtual === 1) {
+        console.log('🔍 Verificando dia 31 do mês anterior...')
+        
+        let mesAnterior = mes - 1
+        let anoAnterior = ano
+        
+        if (mesAnterior === 0) {
+          mesAnterior = 12
+          anoAnterior = ano - 1
+        }
+        
+        // Verifica se o mês anterior tem dia 31
+        if (getUltimoDiaMes(anoAnterior, mesAnterior) >= 31) {
+          const mesAnteriorStr = mesAnterior.toString().padStart(2, '0')
+          const dataDia31 = `${anoAnterior}-${mesAnteriorStr}-31`
+          
+          const { data: dadosDia31, error: error31 } = await supabase
+            .from('agendamentos')
+            .select(`
+              *,
+              clientes!inner(nome),
+              servicos!inner(nome, comissao_salao, comissao_indicacao)
+            `)
+            .eq('status', 'realizado')
+            .eq('data', dataDia31)
+
+          if (!error31 && dadosDia31 && dadosDia31.length > 0) {
+            console.log(`✅ Adicionando ${dadosDia31.length} atendimento(s) do dia 31`)
+            todosDados = [...dadosDia31, ...todosDados]
+          }
+        }
+      }
+
+      console.log(`🎯 Dados processados: ${todosDados.length} registros`)
+      agruparPorDia(todosDados)
+      
+    } catch (error) {
+      console.error('❌ Erro crítico ao carregar relatório:', error)
+      alert('Erro ao carregar relatório. Tente novamente.')
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Carregar dados do relatório
-  async function carregarRelatorio() {
-    setLoading(true)
-    const { inicio, fim } = getPeriodDates(periodo, ano, mes)
+  // Função para buscar dados por dias individuais (à prova de erros)
+  async function buscarPorDiasIndividuais() {
+    console.log('🔄 Buscando dados por dias individuais...')
     
+    const mesStr = mes.toString().padStart(2, '0')
+    let todosDados = []
+    
+    if (periodo === 1) {
+      // 1ª Quinzena: dias 01 a 15
+      for (let dia = 1; dia <= 15; dia++) {
+        if (dataExiste(ano, mes, dia)) {
+          const dataBusca = `${ano}-${mesStr}-${dia.toString().padStart(2, '0')}`
+          const { data, error } = await buscarDiaEspecifico(dataBusca)
+          if (!error && data) {
+            todosDados = [...todosDados, ...data]
+          }
+        }
+      }
+    } else {
+      // 2ª Quinzena: precisa determinar o intervalo correto
+      const ultimoDiaMes = getUltimoDiaMes(ano, mes)
+      const diaInicio = 16
+      const diaFim = ultimoDiaMes >= 30 ? 30 : ultimoDiaMes
+      
+      console.log(`📅 Buscando dias ${diaInicio} a ${diaFim}...`)
+      
+      for (let dia = diaInicio; dia <= diaFim; dia++) {
+        if (dataExiste(ano, mes, dia)) {
+          const dataBusca = `${ano}-${mesStr}-${dia.toString().padStart(2, '0')}`
+          const { data, error } = await buscarDiaEspecifico(dataBusca)
+          if (!error && data) {
+            todosDados = [...todosDados, ...data]
+          }
+        }
+      }
+    }
+    
+    console.log(`✅ Busca individual: ${todosDados.length} registros`)
+    return todosDados
+  }
+
+  // Função auxiliar para buscar um dia específico
+  async function buscarDiaEspecifico(data) {
     try {
-      const { data, error } = await supabase
+      const { data: result, error } = await supabase
         .from('agendamentos')
         .select(`
           *,
@@ -114,24 +291,56 @@ export function QuinzenalReportMobile() {
           servicos!inner(nome, comissao_salao, comissao_indicacao)
         `)
         .eq('status', 'realizado')
-        .gte('data', inicio)
-        .lte('data', fim)
-        .order('data', { ascending: true })
-
-      if (error) throw error
-
-      if (data) {
-        agruparPorDia(data)
-      }
+        .eq('data', data)
+      
+      return { data: result || [], error }
     } catch (error) {
-      console.error('Erro ao carregar relatório:', error)
-      alert('Erro ao carregar relatório')
-    } finally {
-      setLoading(false)
+      console.warn(`⚠️ Erro ao buscar data ${data}:`, error.message)
+      return { data: [], error }
     }
   }
 
-  // Agrupar dados por dia
+  // DEBUG: Verificar dados do banco
+  async function verificarDadosDebug() {
+    console.log('=== 🐛 DEBUG COMPLETO ===')
+    
+    // Verifica dia 31/01/2026
+    console.log('1. Buscando dia 31/01/2026...')
+    const { data: dia31 } = await buscarDiaEspecifico('2026-01-31')
+    console.log('Dia 31/01/2026:', dia31.data)
+    
+    // Verifica datas de fevereiro
+    console.log('\n2. Verificando datas de fevereiro 2026...')
+    const fevereiro2026 = []
+    for (let dia = 1; dia <= 29; dia++) {
+      if (dataExiste(2026, 2, dia)) {
+        fevereiro2026.push(`${dia.toString().padStart(2, '0')}/02`)
+      }
+    }
+    console.log('Datas válidas fev/2026:', fevereiro2026)
+    
+    // Verifica lógica do período
+    console.log('\n3. Verificando lógica de períodos...')
+    const periodosTeste = [
+      { mes: 1, periodo: 2, ano: 2026 },
+      { mes: 2, periodo: 2, ano: 2026 },
+      { mes: 3, periodo: 2, ano: 2026 },
+      { mes: 4, periodo: 2, ano: 2026 }
+    ]
+    
+    for (const teste of periodosTeste) {
+      const dates = getPeriodDates(teste.periodo, teste.ano, teste.mes)
+      console.log(`${teste.mes}/${teste.ano} - ${teste.periodo}ª:`, {
+        inicio: dates.inicio,
+        fim: dates.fim,
+        label: dates.label
+      })
+    }
+    
+    alert('✅ Debug completo! Verifique o console (F12)')
+  }
+
+  // Funções auxiliares (mantidas do código anterior)
   function agruparPorDia(dados) {
     const agrupado = dados.reduce((acc, item) => {
       const data = item.data
@@ -156,15 +365,13 @@ export function QuinzenalReportMobile() {
       })
     
     setResumoDiario(arrayAgrupado)
-    setExpandedDay(null) // Fecha qualquer dia expandido
+    setExpandedDay(null)
   }
 
-  // Calcular total geral
   function calcularTotalGeral() {
     return resumoDiario.reduce((total, dia) => total + dia.totalDia, 0)
   }
 
-  // Formatar nome do serviço
   function formatarNomeServico(servicoNome, quantidade) {
     let nome = servicoNome.replace(/\(.*?\)/g, '').trim()
     
@@ -182,7 +389,108 @@ export function QuinzenalReportMobile() {
     return nome.trim()
   }
 
-  // Exportar como texto (CORRIGIDO)
+  // Gerar PDF
+  function gerarPDF() {
+    if (resumoDiario.length === 0) return
+    
+    setGeneratingPDF(true)
+    
+    try {
+      const doc = new jsPDF()
+      const { label } = getPeriodDates(periodo, ano, mes)
+      const totalGeral = calcularTotalGeral()
+      
+      let y = 20
+      const lineHeight = 7
+      const pageHeight = doc.internal.pageSize.height
+      const margin = 20
+      
+      // Título
+      doc.setFontSize(16)
+      doc.setFont('helvetica', 'bold')
+      doc.text('FECHAMENTO QUINZENAL', margin, y)
+      y += 10
+      
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'normal')
+      doc.text(label, margin, y)
+      y += 15
+      
+      // Conteúdo
+      doc.setFontSize(10)
+      
+      resumoDiario.forEach(dia => {
+        if (y > pageHeight - 40) {
+          doc.addPage()
+          y = 20
+        }
+        
+        const dataFormatada = formatarDataCurta(dia.data)
+        doc.setFont('helvetica', 'bold')
+        doc.text(dataFormatada, margin, y)
+        y += lineHeight
+        
+        // Agrupar serviços
+        const servicosAgrupados = dia.itens.reduce((acc, item) => {
+          const servicoNome = formatarNomeServico(item.servicos.nome, 1)
+          const key = servicoNome
+          
+          if (!acc[key]) {
+            acc[key] = {
+              nome: servicoNome,
+              quantidade: 0,
+              total: 0
+            }
+          }
+          acc[key].quantidade++
+          acc[key].total += parseFloat(item.valor || 0)
+          return acc
+        }, {})
+        
+        Object.values(servicosAgrupados).forEach(servico => {
+          if (y > pageHeight - 20) {
+            doc.addPage()
+            y = 20
+          }
+          
+          const quantidadeTexto = servico.quantidade > 1 ? `${servico.quantidade} ` : '1 '
+          const nomeServico = servico.quantidade > 1 
+            ? servico.nome.replace('penteado', 'penteados')
+            : servico.nome
+          
+          const linha = `${quantidadeTexto}${nomeServico} = R$ ${servico.total.toFixed(2).replace('.', ',')}`
+          doc.setFont('helvetica', 'normal')
+          doc.text(linha, margin + 5, y)
+          y += lineHeight
+        })
+        
+        y += 5
+      })
+      
+      // Total
+      if (y > pageHeight - 30) {
+        doc.addPage()
+        y = 20
+      }
+      
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.text('TOTAL:', margin, y)
+      doc.text(`R$ ${totalGeral.toFixed(2).replace('.', ',')}`, 150, y, { align: 'right' })
+      
+      const nomeArquivo = `fechamento_${ano}_${mes}_quinzena_${periodo}.pdf`
+      doc.save(nomeArquivo)
+      
+      alert('✅ PDF gerado com sucesso!')
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error)
+      alert('❌ Erro ao gerar PDF')
+    } finally {
+      setGeneratingPDF(false)
+    }
+  }
+
   function exportarComoTexto() {
     const { label } = getPeriodDates(periodo, ano, mes)
     let texto = `Fechamento ${label}\n\n`
@@ -190,9 +498,7 @@ export function QuinzenalReportMobile() {
     let totalGeral = 0
     
     resumoDiario.forEach(dia => {
-      // USANDO FUNÇÃO CORRIGIDA
       const dataFormatada = formatarDataCurta(dia.data)
-      
       texto += `${dataFormatada}\n`
       
       const servicosAgrupados = dia.itens.reduce((acc, item) => {
@@ -239,7 +545,6 @@ export function QuinzenalReportMobile() {
     alert('Relatório exportado com sucesso!')
   }
 
-  // Copiar para clipboard (CORRIGIDO)
   function copiarParaClipboard() {
     const { label } = getPeriodDates(periodo, ano, mes)
     let texto = `Fechamento ${label}\n\n`
@@ -247,9 +552,7 @@ export function QuinzenalReportMobile() {
     let totalGeral = 0
     
     resumoDiario.forEach(dia => {
-      // USANDO FUNÇÃO CORRIGIDA
       const dataFormatada = formatarDataCurta(dia.data)
-      
       texto += `${dataFormatada}\n`
       
       const servicosAgrupados = dia.itens.reduce((acc, item) => {
@@ -287,18 +590,18 @@ export function QuinzenalReportMobile() {
     alert('Relatório copiado para a área de transferência!')
   }
 
-  // Efeito para carregar relatório quando filtros mudam
   useEffect(() => {
     carregarRelatorio()
   }, [periodo, ano, mes])
 
   const totalGeral = calcularTotalGeral()
-  const { labelShort } = getPeriodDates(periodo, ano, mes)
+  const { labelShort, label } = getPeriodDates(periodo, ano, mes)
   const totalServicos = resumoDiario.reduce((total, dia) => total + dia.itens.length, 0)
+  const ultimoDiaMes = getUltimoDiaMes(ano, mes)
 
   return (
     <div className="quinzenal-mobile">
-      {/* Header Compacto */}
+      {/* Header */}
       <div className="report-header">
         <div className="header-title">
           <span className="header-icon">📊</span>
@@ -308,16 +611,37 @@ export function QuinzenalReportMobile() {
           </div>
         </div>
         
-        <button 
-          onClick={carregarRelatorio}
-          className="header-refresh"
-          disabled={loading}
-        >
-          {loading ? '🔄' : '🔄'}
-        </button>
+        <div className="header-buttons">
+          <button 
+            onClick={carregarRelatorio}
+            className="header-refresh"
+            disabled={loading}
+            title="Atualizar"
+          >
+            {loading ? '🔄' : '🔄'}
+          </button>
+          
+          <button 
+            onClick={verificarDadosDebug}
+            className="debug-btn"
+            title="Debug"
+            style={{
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              marginLeft: '8px',
+              fontSize: '16px'
+            }}
+          >
+            🐛
+          </button>
+        </div>
       </div>
 
-      {/* Filtros Compactos */}
+      {/* Filtros */}
       <div className="filters-compact">
         <div className="filter-row">
           <div className="filter-item">
@@ -361,9 +685,27 @@ export function QuinzenalReportMobile() {
             2ª Quinzena
           </button>
         </div>
+        
+        {/* Info do período */}
+        <div className="period-info" style={{
+          background: '#e8f4fd',
+          border: '1px solid #b6d4fe',
+          borderRadius: '6px',
+          padding: '8px',
+          marginTop: '10px',
+          fontSize: '12px',
+          color: '#084298',
+          textAlign: 'center'
+        }}>
+          <div><strong>{label}</strong></div>
+          <small>
+            {periodo === 2 && ultimoDiaMes < 30 && 
+              `(Fevereiro tem apenas ${ultimoDiaMes} dias)`}
+          </small>
+        </div>
       </div>
 
-      {/* View Mode Toggle */}
+      {/* View Mode */}
       <div className="view-mode-toggle">
         <button 
           onClick={() => setViewMode('cards')}
@@ -379,7 +721,7 @@ export function QuinzenalReportMobile() {
         </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       {!loading && resumoDiario.length > 0 && (
         <div className="stats-cards">
           <div className="stat-card">
@@ -402,7 +744,7 @@ export function QuinzenalReportMobile() {
         </div>
       )}
 
-      {/* Loading/Empty State */}
+      {/* Loading/Empty */}
       {loading ? (
         <div className="loading-state">
           <div className="loading-spinner">🔄</div>
@@ -424,7 +766,6 @@ export function QuinzenalReportMobile() {
               onClick={() => setExpandedDay(expandedDay === index ? null : index)}
             >
               <div className="day-header">
-                {/* CORRIGIDO: Usando função segura */}
                 <div className="day-date">
                   {formatarDataSegura(dia.data, {
                     weekday: 'short',
@@ -449,10 +790,7 @@ export function QuinzenalReportMobile() {
                           {item.clientes?.nome?.split(' ')[0] || 'Cliente'}
                         </div>
                         <div className="service-desc">
-                          {item.servicos?.nome?.split(' ')[0] || 'Serviço'}
-                          <span className={`service-type ${item.tipo}`}>
-                            {item.tipo === 'salao' ? '💈' : '👥'}
-                          </span>
+                          {formatarNomeServico(item.servicos?.nome || 'Serviço', 1)}
                         </div>
                       </div>
                       <div className="service-value">
@@ -470,33 +808,32 @@ export function QuinzenalReportMobile() {
         <div className="text-view">
           <div className="text-header">
             <h3>Fechamento {labelShort}</h3>
+            <small>{label}</small>
           </div>
           
           <div className="text-content">
             {resumoDiario.map(dia => {
-              // CORRIGIDO: Usando função segura
               const dataFormatada = formatarDataCurta(dia.data)
-              
-              const servicosAgrupados = dia.itens.reduce((acc, item) => {
-                const servicoNome = formatarNomeServico(item.servicos.nome, 1)
-                const key = servicoNome
-                
-                if (!acc[key]) {
-                  acc[key] = {
-                    nome: servicoNome,
-                    quantidade: 0,
-                    total: 0
-                  }
-                }
-                acc[key].quantidade++
-                acc[key].total += parseFloat(item.valor || 0)
-                return acc
-              }, {})
               
               return (
                 <div key={dia.data} className="text-day">
                   <div className="text-date">{dataFormatada}</div>
-                  {Object.values(servicosAgrupados).map((servico, idx) => {
+                  
+                  {Object.values(dia.itens.reduce((acc, item) => {
+                    const servicoNome = formatarNomeServico(item.servicos.nome, 1)
+                    const key = servicoNome
+                    
+                    if (!acc[key]) {
+                      acc[key] = {
+                        nome: servicoNome,
+                        quantidade: 0,
+                        total: 0
+                      }
+                    }
+                    acc[key].quantidade++
+                    acc[key].total += parseFloat(item.valor || 0)
+                    return acc
+                  }, {})).map((servico, idx) => {
                     const quantidadeTexto = servico.quantidade > 1 ? `${servico.quantidade} ` : '1 '
                     const nomeServico = servico.quantidade > 1 
                       ? servico.nome.replace('penteado', 'penteados')
@@ -511,6 +848,7 @@ export function QuinzenalReportMobile() {
                       </div>
                     )
                   })}
+                  
                   <div className="text-spacer"></div>
                 </div>
               )
@@ -524,31 +862,38 @@ export function QuinzenalReportMobile() {
         </div>
       )}
 
-      {/* Action Buttons (Fixed at bottom) */}
+      {/* Action Buttons */}
       {resumoDiario.length > 0 && (
         <div className="action-buttons-compact">
           <button 
             onClick={exportarComoTexto}
             className="action-btn export"
+            disabled={generatingPDF}
           >
             <span className="btn-icon">📥</span>
-            <span className="btn-text">Exportar</span>
+            <span className="btn-text">Exportar TXT</span>
           </button>
           
           <button 
             onClick={copiarParaClipboard}
             className="action-btn copy"
+            disabled={generatingPDF}
           >
             <span className="btn-icon">📋</span>
             <span className="btn-text">Copiar</span>
           </button>
           
           <button 
-            onClick={() => window.print()}
-            className="action-btn print"
+            onClick={gerarPDF}
+            className="action-btn pdf"
+            disabled={generatingPDF}
           >
-            <span className="btn-icon">🖨️</span>
-            <span className="btn-text">Imprimir</span>
+            <span className="btn-icon">
+              {generatingPDF ? '⏳' : '📄'}
+            </span>
+            <span className="btn-text">
+              {generatingPDF ? 'Gerando...' : 'Gerar PDF'}
+            </span>
           </button>
         </div>
       )}
