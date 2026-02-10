@@ -1,0 +1,643 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.visitas-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.visitas-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.visita-stat {
+  text-align: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.visita-stat .stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4a6cf7;
+  margin-bottom: 4px;
+}
+
+.visita-stat .stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.btn-primary {
+  background: #4a6cf7;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #3a5ce5;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #f0f2f5;
+  color: #333;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e4e6e9;
+}
+
+.btn-primary:disabled, .btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.visita-form {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.visita-form h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4a6cf7;
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.1);
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.visitas-list {
+  padding: 20px;
+}
+
+.list-header h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+}
+
+.visitas-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.visita-card-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visita-card-item:hover {
+  transform: translateX(4px);
+  border-color: #4a6cf7;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.visita-card-item.hoje {
+  border-left: 4px solid #4a6cf7;
+  background: #f8f9ff;
+}
+
+.visita-card-item.fechada {
+  background: #f0fff4;
+  border-color: #d4edda;
+}
+
+.visita-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.visita-card-cliente {
+  flex: 1;
+}
+
+.visita-card-cliente strong {
+  font-size: 1rem;
+  color: #333;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.visita-contato {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visita-card-data {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.badge-hoje {
+  background: #4a6cf7;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.visita-observacoes {
+  margin: 12px 0;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.visita-fechada {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #d4edda;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #155724;
+}
+
+.fechada-icon {
+  font-size: 16px;
+}
+
+.visita-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: none;
+  background: #f0f2f5;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-btn.edit:hover {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.action-btn.danger:hover {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+@media (max-width: 600px) {
+  .visitas-modal {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  .visitas-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+/* ... mantém tudo anterior ... */
+
+/* Adicionar estes novos estilos */
+
+.list-filters {
+  margin-top: 4px;
+}
+
+.filter-info {
+  font-size: 0.85rem;
+  color: #666;
+  background: #f0f2f5;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.visita-card-item.aberta {
+  border-left: 4px solid #ffc107;
+  background: #fff8e1;
+}
+
+.visita-card-item.fechada {
+  border-left: 4px solid #28a745;
+  background: #f0fff4;
+}
+
+.visita-card-status {
+  margin: 12px 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-fechada {
+  background: #d4edda;
+  color: #155724;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.status-aberta {
+  background: #fff3cd;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.fechada-icon, .aberta-icon {
+  font-size: 16px;
+}
+
+/* Novos estilos para botões de ação */
+.action-btn.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.action-btn.warning:hover {
+  background: #ffeaa7;
+  color: #856404;
+}
+
+.action-btn.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.action-btn.success:hover {
+  background: #c3e6cb;
+  color: #155724;
+}
+
+.action-btn.edit {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.action-btn.edit:hover {
+  background: #bbdefb;
+  color: #1565c0;
+}
+
+.action-btn.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.action-btn.danger:hover {
+  background: #f5c6cb;
+  color: #721c24;
+}
+
+/* Remover o hover do card inteiro para evitar conflito */
+.visita-card-item {
+  cursor: default;
+}
+
+.visita-card-item:hover {
+  transform: none;
+  border-color: #eee;
+  box-shadow: none;
+}
+
+/* Ajustar espaçamento dos botões */
+.visita-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Estilos para os status */
+.status-fechado {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.status-nao-fechou {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.status-aberto {
+  background: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+.visita-card-status {
+  margin: 12px 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-icon {
+  font-size: 16px;
+}
+
+/* Botões de ação */
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-btn.edit {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.action-btn.edit:hover {
+  background: #bbdefb;
+}
+
+.action-btn.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.action-btn.success:hover {
+  background: #c3e6cb;
+}
+
+.action-btn.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.action-btn.danger:hover {
+  background: #f5c6cb;
+}
+
+.action-btn.danger.delete {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.action-btn.danger.delete:hover {
+  background: #f5c6cb;
+}
+
+.action-btn.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.action-btn.warning:hover {
+  background: #ffeaa7;
+}
+
+/* Container dos botões */
+.visita-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .visita-card-actions {
+    gap: 6px;
+  }
+}

@@ -1,60 +1,82 @@
 :root {
-  /* Cores Principais */
-  --primary-50: #f5f3ff;
-  --primary-100: #ede9fe;
-  --primary-200: #ddd6fe;
-  --primary-300: #c4b5fd;
-  --primary-400: #a78bfa;
-  --primary-500: #8b5cf6;
-  --primary-600: #7c3aed;
-  --primary-700: #6d28d9;
-  --primary-800: #5b21b6;
-  --primary-900: #4c1d95;
+  /* NOVA PALETA GOLD/ÂMBAR - ELEGANTE E PREMIUM */
+  --gold-50: #fffdf6;
+  --gold-100: #fef9e6;
+  --gold-200: #fceec8;
+  --gold-300: #f9e3a7;
+  --gold-400: #f5d074;
+  --gold-500: #f0b429; /* Gold principal */
+  --gold-600: #d69c1d;
+  --gold-700: #b07d16;
+  --gold-800: #8a6312;
+  --gold-900: #6d4f0e;
   
-  /* Cores Neutras */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  /* Cores de Apoio - Bege/Areia */
+  --sand-50: #fdfaf6;
+  --sand-100: #f9f3eb;
+  --sand-200: #f3e8d7;
+  --sand-300: #ebdbc0;
+  --sand-400: #dfc99d;
+  --sand-500: #d4b77a;
+  --sand-600: #c9a55d;
+  --sand-700: #a78546;
+  --sand-800: #856936;
+  --sand-900: #6a552b;
   
-  /* Cores de Status */
-  --success-50: #f0fdf4;
-  --success-100: #dcfce7;
-  --success-500: #10b981;
-  --success-700: #047857;
+  /* Cores Neutras (mantidas mas ajustadas para combinar com gold) */
+  --gray-50: #faf9f7;
+  --gray-100: #f5f3f0;
+  --gray-200: #e9e6e0;
+  --gray-300: #d6d2c9;
+  --gray-400: #a8a399;
+  --gray-500: #7d796e;
+  --gray-600: #5d5a52;
+  --gray-700: #47443d;
+  --gray-800: #2d2b26;
+  --gray-900: #1a1916;
   
-  --warning-50: #fffbeb;
-  --warning-100: #fef3c7;
-  --warning-500: #f59e0b;
-  --warning-700: #b45309;
+  /* Cores de Status - Harmonizadas com Gold */
+  --success-50: #f0faf0;
+  --success-100: #dcf5dd;
+  --success-500: #27ae60; /* Verde mais suave */
+  --success-700: #1e8749;
   
-  --error-50: #fef2f2;
-  --error-100: #fee2e2;
-  --error-500: #ef4444;
-  --error-700: #b91c1c;
+  --warning-50: #fff9e6;
+  --warning-100: #fff2cc;
+  --warning-500: #f39c12; /* Âmbar que combina com gold */
+  --warning-700: #b9770e;
   
-  --info-50: #eff6ff;
-  --info-100: #dbeafe;
-  --info-500: #3b82f6;
-  --info-700: #1d4ed8;
+  --error-50: #fef0f0;
+  --error-100: #fcdada;
+  --error-500: #e74c3c; /* Vermelho terroso */
+  --error-700: #c0392b;
   
-  /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --info-50: #eef9ff;
+  --info-100: #d9f0ff;
+  --info-500: #3498db; /* Azul mais suave */
+  --info-700: #2980b9;
   
-  /* Sombras */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 6px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 0.15);
+  /* GRADIENTES GOLD - ELEGANTES */
+  --gradient-gold: linear-gradient(135deg, #f0b429 0%, #d69c1d 100%);
+  --gradient-gold-luxury: linear-gradient(135deg, #f5d074 0%, #f0b429 50%, #d69c1d 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, #fef9e6 0%, #fceec8 100%);
+  --gradient-gold-dark: linear-gradient(135deg, #d69c1d 0%, #b07d16 100%);
+  
+  /* Gradientes para botões e estados */
+  --gradient-primary: var(--gradient-gold); /* Substitui o roxo */
+  --gradient-success: linear-gradient(135deg, #27ae60 0%, #1e8749 100%);
+  --gradient-warning: linear-gradient(135deg, #f39c12 0%, #b9770e 100%);
+  
+  /* Novos gradientes especiais */
+  --gradient-champagne: linear-gradient(135deg, #fffdf6 0%, #fceec8 100%);
+  --gradient-bronze: linear-gradient(135deg, #c9a55d 0%, #a78546 100%);
+  
+  /* Sombras com tom dourado */
+  --shadow-sm: 0 1px 3px 0 rgba(240, 180, 41, 0.1);
+  --shadow: 0 4px 6px -1px rgba(240, 180, 41, 0.1), 0 2px 4px -1px rgba(240, 180, 41, 0.06);
+  --shadow-md: 0 6px 15px -3px rgba(240, 180, 41, 0.1), 0 4px 6px -2px rgba(240, 180, 41, 0.05);
+  --shadow-lg: 0 10px 25px -5px rgba(214, 156, 29, 0.1), 0 8px 10px -6px rgba(214, 156, 29, 0.04);
+  --shadow-xl: 0 20px 40px -10px rgba(176, 125, 22, 0.1), 0 10px 20px -10px rgba(176, 125, 22, 0.04);
   
   /* Bordas */
   --radius-sm: 0.375rem;
@@ -67,4 +89,167 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Novas variáveis para aplicação específica */
+  --color-brand: var(--gold-500);
+  --color-brand-light: var(--gold-400);
+  --color-brand-dark: var(--gold-700);
+  --color-accent: var(--sand-500);
+  --color-background: var(--gray-50);
+  --color-surface: white;
+  --color-text: var(--gray-800);
+  --color-text-light: var(--gray-600);
+  --color-border: var(--gray-200);
+}
+
+/* CLASSES UTILITÁRIAS PARA CORES GOLD */
+.text-gold { color: var(--gold-500); }
+.text-gold-light { color: var(--gold-400); }
+.text-gold-dark { color: var(--gold-700); }
+
+.bg-gold { background-color: var(--gold-500); }
+.bg-gold-light { background-color: var(--gold-100); }
+.bg-gold-gradient { background: var(--gradient-gold); }
+.bg-gold-luxury { background: var(--gradient-gold-luxury); }
+
+.border-gold { border-color: var(--gold-300); }
+.border-gold-dark { border-color: var(--gold-500); }
+
+.shadow-gold { box-shadow: var(--shadow-lg); }
+
+/* ESTILOS DE BOTÃO GOLD */
+.btn-gold {
+  background: var(--gradient-gold);
+  color: white;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.btn-gold:hover {
+  background: var(--gradient-gold-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-gold:hover::after {
+  left: 100%;
+}
+
+/* BOTÃO GOLD OUTLINE */
+.btn-gold-outline {
+  background: transparent;
+  color: var(--gold-600);
+  border: 2px solid var(--gold-300);
+  transition: all var(--transition);
+}
+
+.btn-gold-outline:hover {
+  background: var(--gold-50);
+  border-color: var(--gold-500);
+  color: var(--gold-700);
+}
+
+/* CARDS COM TOQUE GOLD */
+.card-gold {
+  background: var(--color-surface);
+  border: 1px solid var(--gold-200);
+  border-top: 3px solid var(--gold-500);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition);
+}
+
+.card-gold:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--gold-300);
+}
+
+/* BADGE GOLD */
+.badge-gold {
+  background: var(--gradient-gold);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* INPUT COM FOCO GOLD */
+.input-gold:focus {
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 3px rgba(240, 180, 41, 0.1);
+  outline: none;
+}
+
+/* HEADER COM GRADIENTE GOLD */
+.header-gold {
+  background: var(--gradient-gold-luxury);
+  color: white;
+}
+
+/* ESTILOS PARA MODAL GOLD */
+.modal-header-gold {
+  background: var(--gradient-gold);
+  color: white;
+}
+
+/* ESTILOS PARA ÍCONES GOLD */
+.icon-gold {
+  color: var(--gold-500);
+  filter: drop-shadow(0 2px 4px rgba(240, 180, 41, 0.2));
+}
+
+/* ANIMAÇÃO DE BRILHO */
+@keyframes gold-shine {
+  0%, 100% { 
+    background-position: -200% center;
+    opacity: 0.8;
+  }
+  50% { 
+    background-position: 200% center;
+    opacity: 1;
+  }
+}
+
+.shine-effect {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: gold-shine 3s ease-in-out infinite;
+}
+
+/* RESPONSIVIDADE PARA CORES */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gold-500: #f5d074; /* Tom mais claro no dark mode */
+    --gold-600: #f0b429;
+    --gold-700: #d69c1d;
+    --gray-50: #1a1916;
+    --gray-100: #2d2b26;
+    --gray-200: #47443d;
+    --gray-800: #f5f3f0;
+    --gray-900: #faf9f7;
+  }
+  
+  .bg-gold-gradient {
+    background: var(--gradient-gold-dark);
+  }
 }
